@@ -12,12 +12,14 @@ from scipy.optimize import curve_fit
 
 class tracking :
 
-	def __init__ ( self, files = [], stack_images = 0, min_area = 9, max_length = 0, micron_px = 0.1, time_seq = 1, crop_shift = 0, init_x_img = 0, init_y_img = 0, tolerance_tracking = 90, adaptive_stop_tracking = 2, adaptive_step_tracking = 0.5, memory_tracking = 3, diameter_tracking = 3, is_enabled_half_path_detection = True  ) :
+	def __init__ ( self, files = [], stack_images = 0, min_area = 9, max_length = 0, interval = None, window_for_split = 20, micron_px = 0.1, time_seq = 1, crop_shift = 0, init_x_img = 0, init_y_img = 0, tolerance_tracking = 90, adaptive_stop_tracking = 2, adaptive_step_tracking = 0.5, memory_tracking = 3, diameter_tracking = 3, is_enabled_half_path_detection = True  ) :
 
 		self.files = files
 		self.stack_images = stack_images
 		self.min_area =  min_area
 		self.max_length = max_length
+		self.interval = interval
+		self.window_for_split = window_for_split
 		self.micron_px = micron_px
 		self.time_seq = time_seq
 		self.crop_shift = crop_shift
@@ -100,8 +102,12 @@ class tracking :
 	def load ( self ):
 		qty_images_stack = []
 		max_length = self.max_length
+		interval = self.interval
 		if type(self.max_length) is int:
 			max_length = [max_length]*len(self.files)
+
+		if type(self.interval) is int or self.interval is None:
+			interval = [interval]*len(self.files)
 
 		for i in range( len(self.files) ):
 			self.stack_seg[i] = skimage.io.imread( self.files[i] )
@@ -110,9 +116,15 @@ class tracking :
 			height_img = self.stack_seg[i].shape[1] - self.crop_shift
 
 			if max_length[i] <= 0 :
-				self.stack_seg[i] = self.stack_seg[i][:,self.init_y_img:height_img,self.init_x_img:width_img]
+				if interval[i] :
+					self.stack_seg[i] = self.stack_seg[i][::interval[i],self.init_y_img:height_img,self.init_x_img:width_img]
+				else:
+					self.stack_seg[i] = self.stack_seg[i][:,self.init_y_img:height_img,self.init_x_img:width_img]
 			else:
-				self.stack_seg[i] = self.stack_seg[i][0:max_length[i],self.init_y_img:height_img,self.init_x_img:width_img]
+				if interval[i] :
+					self.stack_seg[i] = self.stack_seg[i][0:max_length[i]:interval[i],self.init_y_img:height_img,self.init_x_img:width_img]
+				else:
+					self.stack_seg[i] = self.stack_seg[i][0:max_length[i],self.init_y_img:height_img,self.init_x_img:width_img]
 
 			qty_images_stack.append( self.stack_seg[i].shape[0] )
 
@@ -176,7 +188,8 @@ class tracking :
 			self.cell_tracking[i].loc[:,'cell'] = -1
 
 		for k in range( len(self.stack_seg) ):
-			xdistance = 20
+			#xdistance = 20
+			xdistance = self.window_for_split
 			xcell = 0
 			for xrow in self.find_cells[k]:
 				xdata = []
@@ -257,7 +270,7 @@ class tracking :
 					path_det.append([ row['path'][0]['frame'], row['path'][0]['major_axis_length']*micron_px[i], row['path'][0]['minor_axis_length']*micron_px[i], row['path'][0]['x']*micron_px[i], row['path'][0]['y']*micron_px[i], math.nan, math.nan, math.nan, row['path'][0]['orientation'] ])
 					for index_path in range(1,len(row['path'])):
 						dtheta = math.atan( (row['path'][index_path]['y']-row['path'][index_path-1]['y'])/(row['path'][index_path]['x']-row['path'][index_path-1]['x']) )*180/math.pi
-						xdtheta = dtheta*math.pi/180
+						xdtheta = dtheta
 						if row['path'][index_path]['x'] > row['path'][index_path-1]['x'] and row['path'][index_path]['y'] > row['path'][index_path-1]['y']:
 							dtheta = dtheta
 						elif row['path'][index_path]['x'] > row['path'][index_path-1]['x'] and row['path'][index_path]['y'] < row['path'][index_path-1]['y']:
