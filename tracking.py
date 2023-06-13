@@ -9,6 +9,7 @@ import pandas
 import scipy.signal
 import smallestenclosingcircle
 from scipy.optimize import curve_fit
+from colour import Color
 
 class tracking :
 
@@ -39,6 +40,7 @@ class tracking :
 		self.stack_seg = numpy.full( len(self.files), numpy.nan ).tolist()
 		self.area = numpy.full( len(self.files), numpy.nan ).tolist()
 		self.explore = numpy.full( len(self.files), numpy.nan ).tolist()
+		self.times = numpy.full( len(self.files), numpy.nan ).tolist()
 		self.regions_seg = numpy.full( len(self.files), numpy.nan ).tolist()
 		self.cell_tracking = numpy.full( len(self.files), numpy.nan ).tolist()
 		self.find_cells = numpy.full( len(self.files), numpy.nan ).tolist()
@@ -52,6 +54,7 @@ class tracking :
 			self.stack_seg[i] = []
 			self.area[i] = []
 			self.explore[i] = []
+			self.times[i] = []
 			self.regions_seg[i] = []
 			self.cell_tracking[i] = []
 			self.find_cells[i] = []
@@ -64,7 +67,7 @@ class tracking :
 		self.mean_length_cell = 0
 		self.std_length_cell = 0
 
-		self.util = self.resource()
+		self.util = self.resource( micron_px, time_seq )
 
 	def run ( self ):
 		
@@ -72,9 +75,10 @@ class tracking :
 			self.load()
 			self.processExplore()
 
-			area, explore = self.getExplore()
+			area, explore, xtime = self.getExplore()
 			self.util.setTimeArea( area )
 			self.util.setTimeExplorer( explore )
+			self.util.setTime( xtime )
 			self.util.is_multiple = self._is_keep_multiple_explorer
 		
 		self.regionsExtract()
@@ -91,13 +95,13 @@ class tracking :
 			self.load()
 			self.processExplore()
 
-			area, explore = self.getExplore()
+			area, explore, xtime = self.getExplore()
 			self.util.setTimeArea( area )
 			self.util.setTimeExplorer( explore )
+			self.util.setTime( xtime )
 			self.util.is_multiple = self._is_keep_multiple_explorer
 
 		self._is_execute_explore = True
-
 
 	def load ( self ):
 		qty_images_stack = []
@@ -128,6 +132,7 @@ class tracking :
 
 			qty_images_stack.append( self.stack_seg[i].shape[0] )
 
+		self.util.setQtyImagesStack( qty_images_stack )
 		if self.max_images_explorer <= 0:
 			self.max_images_explorer = numpy.nanmin( qty_images_stack )
 
@@ -247,6 +252,7 @@ class tracking :
 		for i in range( len(self.stack_seg) ):
 			self.explore[i] = numpy.sum( numpy.sum( numpy.cumsum( self.stack_seg[i], axis = 0 ) > 0, axis = 1 ), axis = 1 )
 			self.area[i] = numpy.sum( numpy.sum( self.stack_seg[i] > 0, axis = 1 ), axis = 1 )
+			self.times[i]= numpy.arange(0, self.stack_seg[i].shape[0], 1, dtype = int)
 
 	def processPath ( self ):
 
@@ -376,6 +382,7 @@ class tracking :
 	def getExplore ( self ):
 		xarea = []
 		xexplore = []
+		xtime = []
 		micron_px = self.micron_px
 		if type(self.micron_px) is int or type(self.micron_px) is float:
 			micron_px = [micron_px]*len(self.files)
@@ -384,14 +391,16 @@ class tracking :
 			ximages = self.stack_seg[i].shape[0]
 			xa = self.area[i][1:self.max_images_explorer]*(micron_px[i]**2)
 			xe = (self.explore[i][1:self.max_images_explorer]*(micron_px[i]**2) - self.explore[i][0:self.max_images_explorer-1]*(micron_px[i]**2))/self.time_seq
+			xt = self.times[i][1:self.max_images_explorer]*self.time_seq
 
 			xarea.append( xa )
 			xexplore.append( xe )
+			xtime.append(xt)
 
 		if self._is_keep_multiple_explorer :
-			return xarea, xexplore
+			return xarea, xexplore, xtime
 		else:
-			return numpy.hstack( (xarea) ), numpy.hstack( xexplore )
+			return numpy.hstack( (xarea) ), numpy.hstack( xexplore ), numpy.hstack( xtime )
 
 	def getAllPathDetails ( self ):
 		xdetails = []
@@ -415,6 +424,25 @@ class tracking :
 			plt.subplot(1, len(self.stack_seg), i+1)
 			plt.imshow( ( numpy.sum( self.stack_seg[i], axis = 0 ) > 0 ), cmap = 'gray' )
 
+	def showCumStackWithInitImage ( self, color = 'red' ):
+
+		xcolor = Color( color ).rgb
+
+		plt.figure( figsize = (40, 8) )
+		for i in range( len(self.stack_seg) ):
+			plt.subplot(1, len(self.stack_seg), i+1)
+
+			img_cumsum = ( numpy.sum( self.stack_seg[i], axis = 0 ) > 0 )
+			img = numpy.zeros( (self.stack_seg[i].shape[1], self.stack_seg[i].shape[2], 3) )
+			img[:,:,0] = img_cumsum
+			img[:,:,1] = img_cumsum
+			img[:,:,2] = img_cumsum
+			img[self.stack_seg[i][0,:,:] == 255, 0] = xcolor[0]
+			img[self.stack_seg[i][0,:,:] == 255, 1] = xcolor[1]
+			img[self.stack_seg[i][0,:,:] == 255, 2] = xcolor[2]
+
+			plt.imshow( img )		
+
 	def showDetectedCells ( self ):
 		plt.figure( figsize = (40, 8) )
 		for i in range( len(self.stack_seg) ):
@@ -436,10 +464,20 @@ class tracking :
 
 	class resource :
 
-		def __init__ ( self ):
+		def __init__ ( self, micron_px, time_seq ):
 			self.time_area = []
 			self.time_explorer = []
+			self.time = []
 			self.is_multiple = False
+			self.micron_px = micron_px
+			self.time_seq = time_seq
+			self.qty_images_stack = None
+
+		def setQtyImagesStack (self, qty ):
+			self.qty_images_stack = qty
+
+		def setTime ( self, time ):
+			self.time = time
 
 		def setTimeArea ( self, time_area ):
 			self.time_area = time_area
@@ -475,7 +513,7 @@ class tracking :
 			else:
 				return (result-1/division_time)*cell_size
 
-		def showScatterGlobalSpeed ( self, is_sub = False, color_name = 'black', marker = 'o', ls = '-' ):
+		def showScatterGlobalSpeed ( self, is_sub = False, is_legend = False, color_name = 'black', marker = 'o', ls = '-' ):
 
 			result = self.__fit_global_motility()
 
@@ -495,19 +533,182 @@ class tracking :
 					
 				for i in range( len(result) ):
 					plt.plot( self.time_area[i], self.time_explorer[i], linestyle = '', marker = xmarker[i], color = xcolor[i], alpha = 0.2  )
-					plt.plot( self.time_area[i], self.time_area[i]*result[i], color = xcolor[i], linestyle = xls[i] )
+					plt.plot( self.time_area[i], self.time_area[i]*result[i], label = 'Slope ~ '+str( round(result[i],2) ), color = xcolor[i], linestyle = xls[i] )
 			else:
 				plt.plot( self.time_area, self.time_explorer, linestyle = '', marker = marker, color = color_name, alpha = 0.2  )
-				plt.plot( self.time_area, self.time_area*result, color = color_name, linestyle = ls )
+				plt.plot( self.time_area, self.time_area*result, label = 'Slope ~ '+str( round(result,2) ), color = color_name, linestyle = ls )
 			
 			plt.xlabel(r'$A \; (\mu m^2)$',fontdict = {'size' : 16})
 			plt.ylabel(r'$\Delta S / \Delta t \; (\mu m^2.min^{-1})$', fontdict = {'size' : 16})
 			plt.xticks( fontsize = 16 )
 			plt.yticks( fontsize = 16 )
 			plt.grid( linestyle = ':' )
+			if is_legend :
+				plt.legend( frameon = False )
 
 			return plt
 
+		def showCoverageAreaTime ( self, is_sub = False, is_norm = False, show_multi = False, ylim = None, text_legend = '', marker = 'o', markersize = 12, color_name = 'black', alpha = 0.5 ) :
 
+			if self.is_multiple :
+				
+				if not is_sub:
+					xsize = (7*len(self.qty_images_stack),5) if show_multi else (7,5)
+					plt.figure( figsize = xsize )
 
+				xmarker = marker
+				xcolor = color_name
+				xtext_legend = text_legend
+				if type(xmarker) is not list:
+					xmarker = [xmarker]*len(self.qty_images_stack)
+				if type(xcolor) is not list:
+					xcolor = [xcolor]*len(self.qty_images_stack)
+				if type(xtext_legend) is not list:
+					xtext_legend = [xtext_legend]*len(self.qty_images_stack)
+				
+				for i in range( len(self.qty_images_stack) ):
+					if show_multi:
+						plt.subplot(1,len(self.qty_images_stack),i+1 )
+					ydata = self.time_area[i]/numpy.sum(self.time_area[i]) if is_norm else self.time_area[i]
+					plt.plot( self.time[i], ydata, linestyle = '', marker = xmarker[i], markersize = markersize, label = xtext_legend[i], color = xcolor[i], alpha = alpha  )
+					if show_multi:
+						plt.xlabel('time (min)',fontdict = {'size' : 16})
+						ylabel = 'A (%)' if is_norm else r'$A \; (\mu m^2)$'
+						plt.ylabel(ylabel,fontdict = {'size' : 16})
+						plt.xticks( fontsize = 16 )
+						plt.yticks( fontsize = 16 )
+						if ylim:
+							plt.ylim( ylim )
+						if xtext_legend[i] != '':
+							plt.legend( frameon = False )
+						plt.grid( linestyle = ':' )		
+			else:
+				if not is_sub:
+					plt.figure( figsize = (7,5) )
+
+				ydata = self.time_area/numpy.sum(self.time_area) if is_norm else self.time_area
+				plt.plot( self.time, ydata, linestyle = '', marker = marker, markersize = markersize, label = text_legend, color = color_name, alpha = alpha  )
+
+			if not show_multi:
+				plt.xlabel('time (min)',fontdict = {'size' : 16})
+				ylabel = 'A (%)' if is_norm else r'$A \; (\mu m^2)$'
+				plt.ylabel(ylabel,fontdict = {'size' : 16})
+				plt.xticks( fontsize = 16 )
+				plt.yticks( fontsize = 16 )
+				if ylim:
+					plt.ylim( ylim )
+				if text_legend != '' :
+					plt.legend( frameon = False )
+				plt.grid( linestyle = ':' )
+
+			plt.tight_layout()
+			return plt
+
+		def showCumulativeSurfaceTime ( self, is_sub = False, is_norm = False, show_multi = False, ylim = None, text_legend = '', marker = 'o', markersize = 12, color_name = 'black', alpha = 0.5 ):
+
+			if self.is_multiple :
+				
+				if not is_sub :
+					xsize = (7*len(self.qty_images_stack),5) if show_multi else (7,5)
+					plt.figure( figsize = xsize )
+
+				xmarker = marker
+				xcolor = color_name
+				xtext_legend = text_legend
+				if type(xmarker) is not list:
+					xmarker = [xmarker]*len(self.qty_images_stack)
+				if type(xcolor) is not list:
+					xcolor = [xcolor]*len(self.qty_images_stack)
+				if type(xtext_legend) is not list:
+					xtext_legend = [xtext_legend]*len(self.qty_images_stack)
+				
+				for i in range( len(self.qty_images_stack) ):
+					if show_multi:
+						plt.subplot(1,len(self.qty_images_stack),i+1 )
+					ydata = self.time_explorer[i]/numpy.sum(self.time_explorer[i]) if is_norm else self.time_explorer[i]
+					plt.plot( self.time[i], ydata, linestyle = '', marker = xmarker[i], markersize = markersize, label = xtext_legend[i], color = xcolor[i], alpha = alpha  )
+					if show_multi:
+						plt.xlabel('time (min)',fontdict = {'size' : 16})
+						ylabel = r'$\Delta S / \Delta t \; (%)$' if is_norm else r'$\Delta S / \Delta t \; (\mu m^2.min^{-1})$'
+						plt.ylabel(ylabel,fontdict = {'size' : 16})
+						plt.xticks( fontsize = 16 )
+						plt.yticks( fontsize = 16 )
+						if ylim:
+							plt.ylim( ylim )
+						if xtext_legend[i] != '':
+							plt.legend( frameon = False )
+						plt.grid( linestyle = ':' )		
+			else:
+				if not is_sub :
+					plt.figure( figsize = (7,5) )
+
+				ydata = self.time_explorer/numpy.sum(self.time_explorer) if is_norm else self.time_explorer
+				plt.plot( self.time, ydata, linestyle = '', marker = marker, markersize = markersize, label = text_legend, color = color_name, alpha = alpha  )
+
+			if not show_multi:
+				plt.xlabel('time (min)',fontdict = {'size' : 16})
+				ylabel = r'$\Delta S / \Delta t \; (%)$' if is_norm else r'$\Delta S / \Delta t \; (\mu m^2.min^{-1})$'
+				plt.ylabel(ylabel,fontdict = {'size' : 16})
+				plt.xticks( fontsize = 16 )
+				plt.yticks( fontsize = 16 )
+				if ylim:
+					plt.ylim( ylim )
+				if text_legend != '':
+					plt.legend( frameon = False )
+				plt.grid( linestyle = ':' )
+
+			plt.tight_layout()
+			return plt
+
+		def showCumulativeSurfaceCoverageAreaTime ( self, is_sub = False, show_multi = False, ylim = None, text_legend = '', marker = 'o', markersize = 12, color_name = 'black', alpha = 0.5 ):
+
+			if self.is_multiple :
+				
+				if not is_sub :
+					xsize = (7*len(self.qty_images_stack),5) if show_multi else (7,5)
+					plt.figure( figsize = xsize )
+
+				xmarker = marker
+				xcolor = color_name
+				xtext_legend = text_legend
+				if type(xmarker) is not list:
+					xmarker = [xmarker]*len(self.qty_images_stack)
+				if type(xcolor) is not list:
+					xcolor = [xcolor]*len(self.qty_images_stack)
+				if type(xtext_legend) is not list:
+					xtext_legend = [xtext_legend]*len(self.qty_images_stack)
+				
+				for i in range( len(self.qty_images_stack) ):
+					if show_multi:
+						plt.subplot(1,len(self.qty_images_stack),i+1 )
+					plt.plot( self.time[i], self.time_explorer[i]/self.time_area[i], linestyle = '', marker = xmarker[i], markersize = markersize, label = xtext_legend[i], color = xcolor[i], alpha = alpha  )
+					if show_multi:
+						plt.xlabel('time (min)',fontdict = {'size' : 16})
+						plt.ylabel(r'$\frac {\Delta S / \Delta t} {A}$',fontdict = {'size' : 16})
+						plt.xticks( fontsize = 16 )
+						plt.yticks( fontsize = 16 )
+						if ylim:
+							plt.ylim( ylim )
+						if xtext_legend[i] != '':
+							plt.legend( frameon = False )
+						plt.grid( linestyle = ':' )		
+			else:
+				if not is_sub :
+					plt.figure( figsize = (7,5) )
+
+				plt.plot( self.time, self.time_explorer/self.time_area, linestyle = '', marker = marker, markersize = markersize, label = text_legend, color = color_name, alpha = alpha  )
+
+			if not show_multi:
+				plt.xlabel('time (min)',fontdict = {'size' : 16})
+				plt.ylabel(r'$\frac {\Delta S / \Delta t} {A}$',fontdict = {'size' : 16})
+				plt.xticks( fontsize = 16 )
+				plt.yticks( fontsize = 16 )
+				if ylim:
+					plt.ylim( ylim )
+				if text_legend != '':
+					plt.legend( frameon = False )
+				plt.grid( linestyle = ':' )
+
+			plt.tight_layout()
+			return plt
 

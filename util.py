@@ -4,7 +4,8 @@ import numpy
 import math
 from scipy import stats
 from scipy.optimize import curve_fit
-from scipy.stats import gamma, kurtosis, skew, pearsonr, laplace, norm, cauchy, chi, gengamma, expon, pareto, powerlaw, loguniform, lognorm, chi2, pearson3, betaprime, genpareto, nct as ncstudent, t as student, studentized_range
+from scipy.stats import gamma, kurtosis, skew, pearsonr, laplace, norm, cauchy, chi, gengamma, expon, pareto, powerlaw, loguniform, lognorm, chi2, pearson3, betaprime, genpareto, nct as ncstudent, t as student, studentized_range, rayleigh, linregress
+from colour import Color
 
 class util :
 
@@ -27,6 +28,29 @@ class util :
 	def setTestThresholdValue ( self, test_threshold_value = 0.01 ) :
 		self._test_threshold_value = test_threshold_value
 
+	def __UtilClearXY ( self, xdata, ydata ) :
+
+		xtmp_data = xdata
+		ytmp_data = ydata
+
+		i_nonnan = numpy.where( ~numpy.isnan(xtmp_data) )[0]
+		xtmp_data = xtmp_data[i_nonnan]
+		ytmp_data = ytmp_data[i_nonnan]
+
+		i_nonnan = numpy.where( ~numpy.isnan(ytmp_data) )[0]
+		xtmp_data = xtmp_data[i_nonnan]
+		ytmp_data = ytmp_data[i_nonnan]
+
+		i_noninf = numpy.where( ~numpy.isinf(xtmp_data) )[0]
+		xtmp_data = xtmp_data[i_noninf]
+		ytmp_data = ytmp_data[i_noninf]
+
+		i_noninf = numpy.where( ~numpy.isinf(ytmp_data) )[0]
+		xtmp_data = xtmp_data[i_noninf]
+		ytmp_data = ytmp_data[i_noninf]
+
+		return xtmp_data, ytmp_data
+
 	def scheme_polar_histogram ( self, data = [], size = (12,4), bin_size = 20 ):
 
 		plt.figure( figsize = size )
@@ -45,12 +69,17 @@ class util :
 
 		return plt
 
-	def scheme_scatter ( self, is_multi = False, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_axis_equal = False, alpha = 0.2, marker = 'o', markersize = 100, size = (12,5), is_color = False, xdata = [], ydata = [], xlabel = '', ylabel = '', is_legend = False, xscale = 'linear', yscale = 'linear' ) :
+	def scheme_scatter ( self, is_multi = False, ylim = None, vlines_x = [], is_binned = False, bins = 20, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_axis_equal = False, alpha = 0.2, marker = 'o', markersize = 100, size = (12,5), is_color = False, xdata = [], ydata = [], xlabel = '', ylabel = '', is_legend = False, xscale = 'linear', yscale = 'linear' ) :
+
+		xwindow = [window]*len(xdata) if type(window) is not list else window
 
 		plt.figure( figsize = size )
 
 		info_fit = []
 		multi_data = []
+		ymin = []
+		ymax = []
+		vlines_per = []
 		if not is_multi and is_fit and is_fit_all and len(xdata)>0:
 			multi_data = numpy.stack( ( xdata[0], ydata[0] ), axis = -1 )
 
@@ -65,11 +94,56 @@ class util :
 			if not is_multi and is_fit and is_fit_all and i > 0:
 				multi_data = numpy.concatenate( ( multi_data, numpy.stack( ( xdata[i], ydata[i] ), axis = -1 ) ), axis = 0 )
 
-			plt.scatter( xdata[i], ydata[i], c = xcolor, label = self._names[i], alpha = alpha, s = markersize, marker = marker )
+			temp_x = xdata[i]
+			temp_y = ydata[i]
+			if xscale == 'log' and yscale == 'linear':
+				i_nonneg = numpy.where( temp_x > 0 )[0]
+				temp_x = temp_x[ i_nonneg ]
+				temp_y = temp_y[ i_nonneg ]
+			elif xscale == 'linear' and yscale == 'log':
+				i_nonneg = numpy.where( temp_y > 0 )[0]
+				temp_x = temp_x[ i_nonneg ]
+				temp_y = temp_y[ i_nonneg ]
+			elif xscale == 'log' and yscale == 'log':
+				i_nonneg = numpy.where( temp_x > 0 )[0]
+				temp_x = temp_x[ i_nonneg ]
+				temp_y = temp_y[ i_nonneg ]
+				i_nonneg = numpy.where( temp_y > 0 )[0]
+				temp_x = temp_x[ i_nonneg ]
+				temp_y = temp_y[ i_nonneg ]
+			
+			ymin = numpy.amin( temp_y )
+			ymax = numpy.amax( temp_y )
+
+			xvline_per = []
+			for i_xline in range( len(vlines_x) ) :
+				xline_shape = None
+				if i_xline == 0 :
+					xline_shape = temp_x[ temp_x < vlines_x[i_xline] ].shape
+					xvline_per.append( xline_shape[0]*100/temp_x.shape[0] )
+				elif i_xline == ( len(vlines_x) - 1 ):
+					xline_shape = temp_x[ numpy.logical_and(temp_x >= vlines_x[i_xline-1], temp_x <= vlines_x[i_xline]) ].shape
+					xvline_per.append( xline_shape[0]*100/temp_x.shape[0] )
+					xline_shape = temp_x[ temp_x > vlines_x[i_xline] ].shape
+					xvline_per.append( xline_shape[0]*100/temp_x.shape[0] )
+				else:
+					xline_shape = temp_x[ numpy.logical_and(temp_x >= vlines_x[i_xline-1], temp_x < vlines_x[i_xline]) ].shape
+					xvline_per.append( xline_shape[0]*100/temp_x.shape[0] )
+
+			vlines_per.append( xvline_per )
+
+			plt.scatter( temp_x, temp_y, c = xcolor, label = self._names[i], alpha = alpha, s = markersize, marker = marker )
+			
+			if is_multi and is_binned :
+				ybin, xbin, binnumber = stats.binned_statistic( xdata[i], ydata[i], 'mean', bins = bins )
+				ybin_std, xbin_std, binnumber_std = stats.binned_statistic( xdata[i], ydata[i], 'std', bins = bins )
+				binned_color = Color( self._colors[i] )
+				binned_color.saturation = 0.5
+				plt.errorbar( xbin[1::] - (xbin[1]-xbin[0])*0.5 ,ybin, xerr = (xbin[1]-xbin[0])*0.5, yerr = ybin_std, color = binned_color.hex, markeredgecolor = 'black', linestyle = ':', markersize = markersize/10, marker = marker )
 
 			if is_fit and not is_fit_all:
-				xfit = xdata[i][window[0]:window[1]] if window else xdata[i]
-				yfit = ydata[i][window[0]:window[1]] if window else ydata[i]
+				xfit = xdata[i][xwindow[i][0]:xwindow[i][1]] if xwindow[i] else xdata[i]
+				yfit = ydata[i][xwindow[i][0]:xwindow[i][1]] if xwindow[i] else ydata[i]
 				i_nonnan = numpy.where( ~numpy.isnan(yfit) )[0]
 				xfit = xfit[i_nonnan]
 				yfit = yfit[i_nonnan]
@@ -86,17 +160,85 @@ class util :
 					def fit_linear ( x, m, c ):
 						return x*m + c
 					xrest = curve_fit( fit_linear, xfit, yfit )
-					plt.plot( xfit, xrest[0][0]*xfit + xrest[0][1], color = self._colors[i], linestyle ='-', lw = 2 )
+					bins_edges = numpy.linspace( numpy.min(xfit), numpy.max(xfit), 100 )
+					plt.plot( bins_edges, xrest[0][0]*bins_edges + xrest[0][1], color = self._colors[i], linestyle ='-', lw = 2 )
 
 					info_fit.append( { 'slope' : xrest[0][0], 'intersection' : xrest[0][1], 'pearson': pearsonr( xfit, yfit )} )
+				elif type_fit == 'bilinear':
+
+					xfit_1 = xdata[i][xwindow[i][0][0]:xwindow[i][0][1]] if xwindow[i] else xdata[i]
+					yfit_1 = ydata[i][xwindow[i][0][0]:xwindow[i][0][1]] if xwindow[i] else ydata[i]
+
+					xfit_2 = xdata[i][xwindow[i][1][0]:xwindow[i][1][1]] if xwindow[i] else xdata[i]
+					yfit_2 = ydata[i][xwindow[i][1][0]:xwindow[i][1][1]] if xwindow[i] else ydata[i]
+
+					xfit_1, yfit_1 = self.__UtilClearXY( xfit_1, yfit_1 )
+					xfit_2, yfit_2 = self.__UtilClearXY( xfit_2, yfit_2 )
+
+					bins_edges_1 = numpy.linspace( numpy.min(xfit_1), numpy.max(xfit_1), 50 )
+					bins_edges_2 = numpy.linspace( numpy.min(xfit_2), numpy.max(xfit_2), 50 )
+
+					xrest_1 = linregress( xfit_1, yfit_1 )
+					xrest_2 = linregress( xfit_2, yfit_2 )
+
+					plt.plot( bins_edges_1, xrest_1.slope*bins_edges_1 + xrest_1.intercept, color = self._colors[i], linestyle ='-', lw = 2 )
+					plt.plot( bins_edges_2, xrest_2.slope*bins_edges_2 + xrest_2.intercept, color = self._colors[i], linestyle =':', lw = 2 )
+
+					info_fit.append( { 'slope 1' : xrest_1.slope, 'intersection 1' : xrest_1.intercept, 'pearson 1': pearsonr( xfit_1, yfit_1 ), 'slope 2' : xrest_2.slope, 'intersection 2' : xrest_2.intercept, 'pearson 2': pearsonr( xfit_2, yfit_2 )} )
 
 				elif type_fit == 'powerlaw':
 					def fit_powerlaw ( x, m, c ):
 						return x*m + c
 					xrest = curve_fit( fit_powerlaw, numpy.log10(xfit), numpy.log10(yfit) )
-					plt.plot( xfit,  numpy.power(xfit, xrest[0][0] )*math.pow(10, xrest[0][1]), linestyle = '-', color = self._colors[i], lw = 2 )
+					bins_edges = numpy.linspace( numpy.min(xfit), numpy.max(xfit), 100 )
+					plt.plot( bins_edges,  numpy.power(bins_edges, xrest[0][0] )*math.pow(10, xrest[0][1]), linestyle = '-', color = self._colors[i], lw = 2 )
 					
 					info_fit.append( { 'slope' : xrest[0][0], 'const' : math.pow(10, xrest[0][1]), 'pearson': pearsonr( numpy.log10(xfit), numpy.log10(yfit) )} )
+				elif type_fit == 'bipowerlaw':
+
+					xfit_1 = xdata[i][xwindow[i][0][0]:xwindow[i][0][1]] if xwindow[i] else xdata[i]
+					yfit_1 = ydata[i][xwindow[i][0][0]:xwindow[i][0][1]] if xwindow[i] else ydata[i]
+
+					xfit_2 = xdata[i][xwindow[i][1][0]:xwindow[i][1][1]] if xwindow[i] else xdata[i]
+					yfit_2 = ydata[i][xwindow[i][1][0]:xwindow[i][1][1]] if xwindow[i] else ydata[i]
+
+					xfit_1, yfit_1 = self.__UtilClearXY( xfit_1, yfit_1 )
+					xfit_2, yfit_2 = self.__UtilClearXY( xfit_2, yfit_2 )
+
+					bins_edges_1 = numpy.linspace( numpy.min(xfit_1), numpy.max(xfit_1), 50 )
+					bins_edges_2 = numpy.linspace( numpy.min(xfit_2), numpy.max(xfit_2), 50 )
+
+					xrest_1 = linregress( numpy.log10(xfit_1), numpy.log10(yfit_1) )
+					xrest_2 = linregress( numpy.log10(xfit_2), numpy.log10(yfit_2) )
+
+					plt.plot( bins_edges_1, numpy.power(bins_edges_1, xrest_1.slope )*math.pow(10, xrest_1.intercept), color = self._colors[i], linestyle ='-', lw = 2 )
+					plt.plot( bins_edges_2, numpy.power(bins_edges_2, xrest_2.slope )*math.pow(10, xrest_2.intercept), color = self._colors[i], linestyle =':', lw = 2 )
+
+					info_fit.append( { 'slope 1' : xrest_1.slope, 'const 1' : math.pow(10, xrest_1.intercept), 'pearson 1': pearsonr( numpy.log10(xfit_1), numpy.log10(yfit_1) ), 'slope 2' : xrest_2.slope, 'const 2' : math.pow(10, xrest_2.intercept), 'pearson 2': pearsonr( numpy.log10(xfit_2), numpy.log10(yfit_2) )} )
+
+				elif type_fit == 'powerlawlin':
+					def fit_powerlaw ( x, m, c ):
+						return (x**m)*c
+					xrest = curve_fit( fit_powerlaw, xfit, yfit )
+					bins_edges = numpy.linspace( numpy.min(xfit), numpy.max(xfit), 100 )
+					plt.plot( bins_edges,  numpy.power(bins_edges, xrest[0][0] )*xrest[0][1], linestyle = '-', color = self._colors[i], lw = 2 )
+					
+					xfit = numpy.log10(xfit)
+					yfit = numpy.log10(yfit)
+					i_noninf = numpy.where( ~numpy.isinf(yfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(yfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+					i_noninf = numpy.where( ~numpy.isinf(xfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(xfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+
+					info_fit.append( { 'slope' : xrest[0][0], 'const' : xrest[0][1], 'pearson': pearsonr( xfit, yfit ) } )
 				elif type_fit == 'exponential':
 					def fit_exponential ( x, m, c ):
 						return x*m*math.log10(math.e) + c
@@ -108,13 +250,16 @@ class util :
 					xfit = xfit[i_nonnan]
 					yfit = yfit[i_nonnan]
 					xrest = curve_fit( fit_exponential, xfit, yfit )
-					plt.plot( xfit,  numpy.exp( xrest[0][0]*xfit)*math.pow(10, xrest[0][1]), linestyle = '-', color = 'black', lw = 2 )
+					bins_edges = numpy.linspace( numpy.min(xfit), numpy.max(xfit), 100 )
+					plt.plot( bins_edges,  numpy.exp( xrest[0][0]*bins_edges)*math.pow(10, xrest[0][1]), linestyle = '-', color = self._colors[i], lw = 2 )
 					
 					info_fit.append( { 'exponent' : xrest[0][0], 'const' : math.pow(10, xrest[0][1]), 'pearson': pearsonr( xfit, yfit )} )
 			
 			if is_multi :
 				if is_axis_equal :
 					plt.axis('equal')
+				if is_legend :
+					plt.title( self._names[i], fontdict = {'fontsize':self._font_size} )
 				plt.xticks( fontsize = self._font_size )
 				plt.yticks( fontsize = self._font_size )
 				plt.xscale( xscale )
@@ -122,8 +267,26 @@ class util :
 				plt.xlabel( xlabel, fontdict = { 'size' : self._font_size } )
 				plt.ylabel( ylabel, fontdict = { 'size' : self._font_size } )
 				plt.grid( linestyle = ':' )
+				if ylim :
+					plt.ylim( ylim )
+				if len(vlines_x) > 0 :
+					plt.vlines( vlines_x, numpy.amin( temp_y ), numpy.amax( temp_y ), linestyle = ':', color = 'black', lw = 2 )
+					for i_xline in range( len(vlines_x) ) :
+						if i_xline == 0 :
+							plt.text( numpy.amin( temp_x ), numpy.amin( temp_y ), str(round(xvline_per[i_xline],2))+' %', fontdict = { 'fontsize' : self._font_size } )
+						elif i_xline == ( len(vlines_x) - 1 ):
+							plt.text( vlines_x[i_xline-1] + (vlines_x[i_xline] - vlines_x[i_xline-1])*0.25, numpy.amin( temp_y ), str(round(xvline_per[i_xline],2))+' %', fontdict = { 'fontsize' : self._font_size } )
+							plt.text( vlines_x[i_xline] + (numpy.amax( temp_x )-vlines_x[i_xline])*0.5, numpy.amin( temp_y ), str(round(xvline_per[i_xline+1],2))+' %', fontdict = { 'fontsize' : self._font_size } )
+						else:
+							plt.text( vlines_x[i_xline-1] + (vlines_x[i_xline] - vlines_x[i_xline-1])*0.25, numpy.amin( temp_y ), str(round(xvline_per[i_xline],2))+' %', fontdict = { 'fontsize' : self._font_size } )
 
 		if not is_multi :
+
+			if is_binned :
+				ybin, xbin, binnumber = stats.binned_statistic( multi_data[:,0], multi_data[:,1], 'mean', bins = bins )
+				ybin_std, xbin_std, binnumber_std = stats.binned_statistic( multi_data[:,0], multi_data[:,1], 'std', bins = bins )
+				plt.errorbar( xbin[1::] - (xbin[1]-xbin[0])*0.5 ,ybin, xerr = (xbin[1]-xbin[0])*0.5, yerr = ybin_std, color = 'dimgray', linestyle = ':', markersize = markersize/10, marker = marker )
+
 			if is_fit and is_fit_all :
 				xfit = multi_data[:,0]
 				yfit = multi_data[:,1]
@@ -152,10 +315,26 @@ class util :
 				elif type_fit == 'powerlaw':
 					def fit_powerlaw ( x, m, c ):
 						return x*m + c
-					xrest = curve_fit( fit_powerlaw, numpy.log10(xfit), numpy.log10(yfit) )
+					
+					xfit = numpy.log10(xfit)
+					yfit = numpy.log10(yfit)
+					i_noninf = numpy.where( ~numpy.isinf(yfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(yfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+					i_noninf = numpy.where( ~numpy.isinf(xfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(xfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+
+					xrest = curve_fit( fit_powerlaw, xfit, yfit )
 					plt.plot( xedge,  numpy.power(xedge, xrest[0][0] )*math.pow(10, xrest[0][1]), linestyle = '-', color = 'black', lw = 2 )
 					
-					info_fit.append( { 'slope' : xrest[0][0], 'const' : math.pow(10, xrest[0][1]), 'pearson': pearsonr( numpy.log10(xfit), numpy.log10(yfit) )} )
+					info_fit.append( { 'slope' : xrest[0][0], 'const' : math.pow(10, xrest[0][1]), 'pearson': pearsonr( xfit, yfit ) } )
 				elif type_fit == 'exponential':
 					def fit_exponential ( x, m, c ):
 						return x*m*math.log10(math.e) + c
@@ -180,6 +359,10 @@ class util :
 			plt.xlabel( xlabel, fontdict = { 'size' : self._font_size } )
 			plt.ylabel( ylabel, fontdict = { 'size' : self._font_size } )
 			plt.grid( linestyle = ':' )
+			if ylim :
+				plt.ylim( ylim )
+			if len(vlines_x) > 0 :
+				plt.vlines( vlines_x, numpy.amin( ymin ), numpy.amax( ymax ), linestyle = ':', color = 'black', lw = 2 )
 			if is_legend :
 				plt.legend( frameon = False )
 		else:
@@ -187,7 +370,7 @@ class util :
 
 		return info_fit, plt
 
-	def scheme_scatter_hist ( self, data = [], bins = 10, is_fit = False, type_fit = 'normal', marker = 'o', markersize = 100, xscale = 'linear', yscale = 'linear', density = False, xlabel = '', ylabel = '', is_multi = False, is_legend = False ):
+	def scheme_scatter_hist ( self, data = [], bins = 10, ylim = None, is_fit = False, type_fit = 'normal', marker = 'o', markersize = 100, xscale = 'linear', yscale = 'linear', density = False, xlabel = '', ylabel = '', is_multi = False, is_legend = False ):
 
 		if not is_multi:
 			plt.figure( figsize = ( 6 , 5) )
@@ -320,7 +503,13 @@ class util :
 						xedges = numpy.linspace( bins_edges[0], bins_edges[-1], 100 )
 						plt.plot( xedges, studentized_range.pdf( xedges, xrest[0], xrest[1], xrest[2], xrest[3] ), linestyle = xls[j], color = xcolor, lw = 4 )
 						xinfo['fit_studentized_range'] = {'k':xrest[0], 'df':xrest[1], 'loc':xrest[2],'scale':xrest[3]}
-
+					elif density and xtype == 'rayleigh':
+						xrest = rayleigh.fit( data[i] )
+						xedges = numpy.linspace( bins_edges[0], bins_edges[-1], 100 )
+						plt.plot( xedges, rayleigh.pdf( xedges, xrest[0], xrest[1] ), linestyle = xls[j], color = xcolor, lw = 4 )
+						xinfo['fit_rayleigh'] = {'loc':xrest[0],'scale':xrest[1]}
+					
+					
 			info.append( xinfo )
 
 			if is_multi:
@@ -331,6 +520,10 @@ class util :
 				plt.ylabel( ylabel , fontdict = { 'size' : self._font_size })
 				plt.xlabel( xlabel , fontdict = { 'size' : self._font_size })
 				plt.grid( linestyle = ':' )
+				if ylim :
+					plt.ylim( ylim )
+				if is_legend :
+					plt.title( self._names[i], fontdict = {'fontsize':self._font_size} )
 
 		if not is_multi:
 			plt.xscale( xscale )
@@ -340,6 +533,8 @@ class util :
 			plt.ylabel( ylabel , fontdict = { 'size' : self._font_size })
 			plt.xlabel( xlabel , fontdict = { 'size' : self._font_size })
 			plt.grid( linestyle = ':' )
+			if ylim :
+				plt.ylim( ylim )
 
 		if is_legend and not is_multi :
 			plt.legend( frameon = False )
@@ -368,6 +563,8 @@ class util :
 			if is_multi :
 				if is_axis_equal :
 					plt.axis('equal')
+				if is_legend :
+					plt.title( self._names[i], fontdict = {'fontsize':self._font_size} )
 				plt.xscale( xscale )
 				plt.yscale( yscale )
 				plt.xticks( fontsize = self._font_size )
@@ -393,7 +590,7 @@ class util :
 
 		return plt
 
-	def scheme_hist ( self, data = [], bins = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', density = False, xlabel = '', ylabel = '', is_multi = False, is_legend = False ):
+	def scheme_hist ( self, data = [], bins = 10, ylim = None, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', density = False, xlabel = '', ylabel = '', is_multi = False, is_legend = False ):
 
 		if not is_multi:
 			plt.figure( figsize = ( 6 , 5) )
@@ -535,6 +732,11 @@ class util :
 						xedges = numpy.linspace( bins_edges[0], bins_edges[-1], 100 )
 						plt.plot( xedges, studentized_range.pdf( xedges, xrest[0], xrest[1], xrest[2], xrest[3] ), linestyle = xls[j], color = xcolor, lw = 4 )
 						xinfo['fit_studentized_range'] = {'k':xrest[0], 'df':xrest[1], 'loc':xrest[2],'scale':xrest[3]}
+					elif density and xtype == 'rayleigh':
+						xrest = rayleigh.fit( data[i] )
+						xedges = numpy.linspace( bins_edges[0], bins_edges[-1], 100 )
+						plt.plot( xedges, rayleigh.pdf( xedges, xrest[0], xrest[1] ), linestyle = xls[j], color = xcolor, lw = 4 )
+						xinfo['fit_rayleigh'] = {'loc':xrest[0],'scale':xrest[1]}
 					elif xtype == 'powerlaw' and htype == 'flip_and_divide':
 						def fit_powerlaw ( x, m, c ):
 							return x*m + c
@@ -572,6 +774,10 @@ class util :
 				plt.ylabel( ylabel , fontdict = { 'size' : self._font_size })
 				plt.xlabel( xlabel , fontdict = { 'size' : self._font_size })
 				plt.grid( linestyle = ':' )
+				if ylim :
+					plt.ylim( ylim )
+				if is_legend :
+					plt.title( self._names[i], fontdict = {'fontsize':self._font_size} )
 
 		if not is_multi:
 			plt.xscale( xscale )
@@ -581,6 +787,8 @@ class util :
 			plt.ylabel( ylabel , fontdict = { 'size' : self._font_size })
 			plt.xlabel( xlabel , fontdict = { 'size' : self._font_size })
 			plt.grid( linestyle = ':' )
+			if ylim :
+				plt.ylim( ylim )
 
 		if is_legend and not is_multi :
 
@@ -595,21 +803,24 @@ class util :
 
 		return info, plt
 		
-	def scheme_single_boxplot ( self, data = [], ylabel = '', span = 0.2, is_test = False, showfliers = True, spancap = 2.1 ):
+	def scheme_single_boxplot ( self, is_sub = False, data = [], ylabel = '', span = 0.2, is_test = False, is_ns_test = False, showfliers = True, spancap = 2.1 ):
 
+		info = []
 		index_position = []
-		plt.figure( figsize = ( 1.5*len(data) , 5) )
+		if not is_sub :
+			plt.figure( figsize = ( 1.5*len(data) , 5) )
 
 		for i in range( len(data) ):
 			plt.boxplot( x = [ data[i] ], positions = [ 1 + span*i ], widths=0.1, notch = True, patch_artist = True, showfliers = showfliers, boxprops = dict( facecolor = self._colors[i] ), medianprops = dict( linewidth = 1, color = 'black' ) )
 			index_position.append( 1 + span*i )
+			info.append({ "mean" : numpy.nanmean(data[i]), "median" : numpy.nanmedian(data[i]), "first quantile" : numpy.nanquantile(data[i],0.25), "third quantile" : numpy.nanquantile(data[i],0.75) })
 		
 		plt.xticks( index_position, self._names, fontsize = self._font_size, rotation = 45 )
 		plt.yticks( fontsize = self._font_size )
 		plt.ylabel( ylabel, fontdict = { 'size' : self._font_size })
 		plt.grid( linestyle = ':' )
 
-		if is_test :
+		if is_test and not is_ns_test :
 
 			mcomb = numpy.nonzero( numpy.tri( len(data) , len(data)  , -1) )
 			mpair = numpy.dstack( (mcomb[1],mcomb[0]) )[0]
@@ -625,28 +836,57 @@ class util :
 
 				lims = plt.axis()
 				y_inter = ( lims[3] - lims[2] )/self._interval_axis_plot
-				plt.ylim([ lims[2], lims[3] + y_inter ])
+				plt.ylim([ lims[2], lims[3] + y_inter + y_inter*2/self._interval_axis_plot ])
 
 				spany = y_inter/count_true_test
 				spanx = span/2
+				index_annotation = 0
 				for i in range( len( pvalues ) ):
 					if pvalues[i] < self._test_threshold_value:
 						difspancap = abs( mpair[i][0] - mpair[i][1] )
 
-						plt.annotate('**', xy=(1 + span*mpair[i][0] + spanx*difspancap , lims[3] + y_inter - spany*i), ha='center', va='bottom', xycoords = 'data', arrowprops=dict(arrowstyle='-[, widthB='+str( spancap*difspancap )+', lengthB=0.5') )
+						plt.annotate('**', xy=(1 + span*mpair[i][0] + spanx*difspancap , lims[3] + y_inter - spany*index_annotation), ha='center', va='bottom', xycoords = 'data', arrowprops=dict(arrowstyle='-[, widthB='+str( spancap*difspancap )+', lengthB=0.5') )
+						index_annotation = index_annotation + 1
+		
+		elif is_test and is_ns_test :
 
-		return plt
+			lims = plt.axis()
+			y_inter = ( lims[3] - lims[2] )/self._interval_axis_plot
+			plt.ylim([ lims[2], lims[3] + y_inter + y_inter/self._interval_axis_plot ])
 
-	def scheme_multiple_boxplot ( self, data = [], xlabels = [], color_box = [], span = 0.2, ylabel = '', showfliers = True, is_test = False, is_legend = False, label_legend = [], spancap = 2.1 ):
+			mcomb = numpy.nonzero( numpy.tri( len(data) , len(data)  , -1) )
+			mpair = numpy.dstack( (mcomb[1],mcomb[0]) )[0]
+			
+			spany = y_inter/len(mpair)
+			spanx = span/2
+			index_annotation = 0
+
+			for row in mpair:
+				test_pvalue = stats.ttest_ind( data[ row[0] ], data[ row[1] ] ).pvalue
+				difspancap = abs( row[0] - row[1] )
+				if test_pvalue < self._test_threshold_value:
+					plt.annotate('**', xy=(1 + span*row[0] + spanx*difspancap , lims[3] + y_inter - spany*index_annotation), ha='center', va='bottom', xycoords = 'data', arrowprops=dict(arrowstyle='-[, widthB='+str( spancap*difspancap )+', lengthB=0.5') )
+				else:
+					plt.annotate('N.S.', xy=(1 + span*row[0] + spanx*difspancap , lims[3] + y_inter - spany*index_annotation), ha='center', va='bottom', xycoords = 'data', arrowprops=dict(arrowstyle='-[, widthB='+str( spancap*difspancap )+', lengthB=0.5') )
+
+				index_annotation = index_annotation + 1
+
+		return info, plt
+
+	def scheme_multiple_boxplot ( self, data = [], xlabels = [], color_box = [], span = 0.2, ylabel = '', showfliers = True, is_test = False, is_ns_test = False, is_legend = False, label_legend = [], spancap = 2.1 ):
 
 		plt.figure( figsize = (1.5*len(data[0])*len(data), 5) )
 
-		index_position  = [ ]
+		info = []
+		index_position  = []
 		xticks_position = []
 		for i in range( len(data) ):
 			positions = []
+			xinfo = []
 			for j in range( len(data[i]) ):
 				positions.append( j + 1 + span*i )
+				xinfo.append({ "mean" : numpy.nanmean(data[i][j]), "median" : numpy.nanmedian(data[i][j]), "first quantile" : numpy.nanquantile(data[i][j],0.25), "third quantile" : numpy.nanquantile(data[i][j],0.75) })
+			info.append( xinfo )
 			index_position.append( positions )
 			xcolor = color_box[i] if len(color_box) > 0 else self._colors[i]
 			plt.boxplot( x = data[i], positions = positions, widths=0.1, notch = True, patch_artist = True, showfliers = showfliers, boxprops = dict( facecolor = xcolor ), medianprops = dict( linewidth = 1, color = 'black' ) )
@@ -670,7 +910,7 @@ class util :
 			xnames = label_legend if len(label_legend) > 0 else self._names
 			plt.legend( legend, xnames, loc = 'upper right', frameon = False )
 
-		if is_test :
+		if is_test and not is_ns_test :
 			pvalues = []
 			mpair= []
 			count_true_test = []
@@ -692,19 +932,44 @@ class util :
 
 				lims = plt.axis()
 				y_inter = ( lims[3] - lims[2] )/self._interval_axis_plot
-				plt.ylim([ lims[2], lims[3] + y_inter ])
+				plt.ylim([ lims[2], lims[3] + y_inter + y_inter*2/self._interval_axis_plot ])
 
 				spany = y_inter/numpy.amax(count_true_test)
 				spanx = span/2
 				for i in range( len( pvalues ) ):
+					index_annotation = 0
 					for j in range( len(pvalues[i]) ):
 						if pvalues[i][j] < self._test_threshold_value:
 							difspancap = abs( mpair[i][j][0] - mpair[i][j][1] )
 
-							plt.annotate('**', xy=(i + 1 + span*mpair[i][j][0] + spanx*difspancap , lims[3] + y_inter - spany*j), ha='center', va='bottom', xycoords = 'data', arrowprops=dict(arrowstyle='-[, widthB='+str( spancap*difspancap )+', lengthB=0.5') )
+							plt.annotate('**', xy=(i + 1 + span*mpair[i][j][0] + spanx*difspancap , lims[3] + y_inter - spany*index_annotation), ha='center', va='bottom', xycoords = 'data', arrowprops=dict(arrowstyle='-[, widthB='+str( spancap*difspancap )+', lengthB=0.5') )
+							index_annotation = index_annotation + 1
 
+		elif is_test and is_ns_test :
 
-		return plt
+			lims = plt.axis()
+			y_inter = ( lims[3] - lims[2] )/self._interval_axis_plot
+			plt.ylim([ lims[2], lims[3] + y_inter + y_inter/self._interval_axis_plot ])
+
+			spany = y_inter/(len(data[0])*(len(data[0]) - 1)/2)
+			spanx = span/2
+
+			for i in range( len(data[0]) ):
+				mcomb = numpy.nonzero( numpy.tri( len(data) , len(data)  , -1) )
+				xmpair = numpy.dstack( (mcomb[1],mcomb[0]) )[0]
+				index_annotation = 0
+				for row in xmpair:
+					test_pvalue = stats.ttest_ind( data[ row[0] ][i], data[ row[1] ][i] ).pvalue
+					difspancap = abs( row[0] - row[1] )
+					if test_pvalue < self._test_threshold_value:
+						plt.annotate('**', xy=(i + 1 + span*row[0] + spanx*difspancap , lims[3] + y_inter - spany*index_annotation), ha='center', va='bottom', xycoords = 'data', arrowprops=dict(arrowstyle='-[, widthB='+str( spancap*difspancap )+', lengthB=0.5') )
+					else:
+						plt.annotate('N.S.', xy=(i + 1 + span*row[0] + spanx*difspancap , lims[3] + y_inter - spany*index_annotation), ha='center', va='bottom', xycoords = 'data', arrowprops=dict(arrowstyle='-[, widthB='+str( spancap*difspancap )+', lengthB=0.5') )
+
+					index_annotation = index_annotation + 1
+				
+
+		return info, plt
 
 
 

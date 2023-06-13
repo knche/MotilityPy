@@ -20,7 +20,7 @@ class motility :
 		self.aspect_ratio = []
 		self.growth_rate = []
 		self.shift_pos = numpy.full( ( self.frame.shape[0], self.frame.shape[1], 4 ), numpy.nan )
-		self.shift_corr = numpy.full( ( self.frame.shape[0], self.frame.shape[1], 3 ), numpy.nan )
+		self.shift_corr = numpy.full( ( self.frame.shape[0], self.frame.shape[1], 2 ), numpy.nan )
 		self.shift_tamsd = numpy.full( (self.frame.shape[0], self.frame.shape[1], 2 ), numpy.nan )
 		self.shift_tamme = numpy.full( (self.frame.shape[0], self.frame.shape[1] ), numpy.nan )
 		self.shift_persistence_distance = numpy.full( (self.frame.shape[0], self.frame.shape[1], 3), numpy.nan )
@@ -124,12 +124,15 @@ class motility :
 		for i in range( len(self.data) ):
 			for j in range( len(self.data[i]) ):
 				sum_corr = 0
+				sum_corr_wo_norm = 0
 				avg_speed = numpy.nanmean( numpy.power( self.frame[:,i,7],2 ) )
 				for k in range( 1, len(self.data[i]) - j ):
 					dx = (self.data[i][k-1][3]-self.data[i][k][3])*(self.data[i][k+j-1][3]-self.data[i][k+j][3])*( math.pow(self.micron_px,2) )
 					dy = (self.data[i][k-1][4]-self.data[i][k][4])*(self.data[i][k+j-1][4]-self.data[i][k+j][4])*( math.pow(self.micron_px,2) )
 					sum_corr = sum_corr + ((dx+dy)/( math.pow(self.time_seq,2) ))/avg_speed
-				self.frame[self.data[i][j][0],i,11] = (sum_corr)/( len(self.data[i]) - j )
+					sum_corr_wo_norm = sum_corr_wo_norm + (dx+dy)/( math.pow(self.time_seq,2) )
+				self.frame[self.data[i][j][0],i,11] = (sum_corr)/( len(self.data[i]) - j ) # normalized
+				self.frame[self.data[i][j][0],i,23] = (sum_corr_wo_norm)/( len(self.data[i]) - j ) # without normalize
 
 
 		#division time, cell size, growth rate & aspect ratio
@@ -143,22 +146,6 @@ class motility :
 			self.cell_size.append( path[0][1]*self.micron_px )
 			self.growth_rate.append( abs(path[ len(path) -1 ][1] - path[0][1])*self.micron_px/(len(path)*self.time_seq - self.time_seq) )
 
-		#persistence time
-		#self.frame[:,:,12] = numpy.full( self.frame[:,:,12].shape, numpy.nan )
-		'''per25_t_div = numpy.percentile(self.divison_time, 25)/self.time_seq
-		per75_t_div = numpy.percentile(self.divison_time, 75)/self.time_seq
-		per50_t_div = numpy.percentile(self.divison_time, 50)/self.time_seq
-		for i in range( self.frame.shape[1] ):
-			i_nonnan = numpy.where( ~numpy.isnan(self.frame[:,i,10]) )[0]
-			if len(i_nonnan) >= per50_t_div and len(i_nonnan) <= (per75_t_div + 1.5*(per75_t_div-per25_t_div)) :
-				xinit_position = i_nonnan[0]
-				self.frame[xinit_position,i,12] = 1
-				self.frame[i_nonnan[ len(i_nonnan) - 1 ],i,12] = 1
-				for j in i_nonnan[1:]:
-					if abs( self.frame[j,i,10] - self.frame[xinit_position,i,10] ) >= 90:
-						xinit_position = j
-						self.frame[xinit_position,i,12] = 1'''
-		
 		self.frame[ self.frame[:,:,21]>= 90 , 12] = 1
 
 		# run rollXYDistance
@@ -258,12 +245,13 @@ class motility :
 
 			self.frame_global[i,26] = numpy.amax( globalviewangle ) if len(globalviewangle) > 0 else math.nan
 
-			if self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16] >= 270 and self.frame[ i_nonnan[0] ,i,16] <= 90 :
-				self.frame_global[i,27] = -( ( 360 - self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16] ) + self.frame[ i_nonnan[0] ,i,16] )
-			elif self.frame[ i_nonnan[0] ,i,16] >= 270 and self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16] <= 90 :
-				self.frame_global[i,27] = ( 360 - self.frame[ i_nonnan[0] ,i,16] ) + self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16]
-			else:
-				self.frame_global[i,27] = self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16] - self.frame[ i_nonnan[0] ,i,16]
+			if len(i_nonnan) > 0 :
+				if self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16] >= 270 and self.frame[ i_nonnan[0] ,i,16] <= 90 :
+					self.frame_global[i,27] = -( ( 360 - self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16] ) + self.frame[ i_nonnan[0] ,i,16] )
+				elif self.frame[ i_nonnan[0] ,i,16] >= 270 and self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16] <= 90 :
+					self.frame_global[i,27] = ( 360 - self.frame[ i_nonnan[0] ,i,16] ) + self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16]
+				else:
+					self.frame_global[i,27] = self.frame[ i_nonnan[ len(i_nonnan) - 1 ] ,i,16] - self.frame[ i_nonnan[0] ,i,16]
 			
 
 			'''
@@ -429,8 +417,9 @@ class motility :
 		for i in range( self.frame.shape[1] ):
 			i_nonnan = numpy.where( ~numpy.isnan(self.frame[:,i,11]) )[0]
 			self.shift_corr[:,i,0] = numpy.roll(self.frame[:,i,11], self.frame.shape[0] - i_nonnan[0] )
-			self.shift_corr[0:(i_nonnan[len(i_nonnan)-1] - i_nonnan[0] + 1),i,1] = numpy.fft.fft( self.frame[i_nonnan[0]:i_nonnan[ len(i_nonnan) -1 ]+1,i,11] ).real
-			self.shift_corr[0:(i_nonnan[len(i_nonnan)-1] - i_nonnan[0] + 1),i,2] = numpy.fft.fft( self.frame[i_nonnan[0]:i_nonnan[ len(i_nonnan) -1 ]+1,i,11] ).imag
+			
+			i_nonnan = numpy.where( ~numpy.isnan(self.frame[:,i,23]) )[0]
+			self.shift_corr[:,i,1] = numpy.roll(self.frame[:,i,23], self.frame.shape[0] - i_nonnan[0] )
 
 	def rollTAMSD ( self ):
 
@@ -457,7 +446,8 @@ class motility :
 
 		for i in range( self.frame.shape[1] ):
 			i_nonnan = numpy.where( ~numpy.isnan(self.frame[:,i,15]) )[0]
-			self.shift_angle[:,i,0] = numpy.roll(self.frame[:,i,15], self.frame.shape[0] - i_nonnan[0] )
+			if i_nonnan.shape[0] > 0:
+				self.shift_angle[:,i,0] = numpy.roll(self.frame[:,i,15], self.frame.shape[0] - i_nonnan[0] )
 
 	def computeGSpeed ( self, explore_fit = [] ):
 		if type( explore_fit ) is list:
@@ -484,17 +474,33 @@ class motility :
 			split_time = split_time[i_nonnan]
 			split_average = split_average[i_nonnan]
 
+			log_time = numpy.log10(split_time)
+			log_average = numpy.log10(split_average)
 
-			xrest = curve_fit( fit_tamsd, numpy.log10(split_time), numpy.log10(split_average) )
-			
-			scaling_exponent_1 = ( math.log10(self.shift_tamsd[2,i,0]) - math.log10(self.shift_tamsd[1,i,0]) )/(math.log10( time_tamsd[2] ) - math.log10( time_tamsd[1] ))
-			coefficient_diffusion_1 = math.pow(10,math.log10(self.shift_tamsd[1,i,0]) - scaling_exponent_1*math.log10( time_tamsd[1] ))
+			i_nonnan = numpy.where( ~numpy.isnan(log_average) )[0]
+			log_time = log_time[ i_nonnan ]
+			log_average = log_average[ i_nonnan ]
+			i_noninf = numpy.where( ~numpy.isinf(log_average) )[0]
+			log_time = log_time[ i_noninf ]
+			log_average = log_average[ i_noninf ]
 
-			self.frame_global[i,28] = xrest[0][0]
-			self.frame_global[i,29] = math.pow(10, xrest[0][1])
+			if len(log_average) > 0 :
+				xrest = curve_fit( fit_tamsd, log_time, log_average )
+				
+				scaling_exponent_1 = ( math.log10(self.shift_tamsd[2,i,0]) - math.log10(self.shift_tamsd[1,i,0]) )/(math.log10( time_tamsd[2] ) - math.log10( time_tamsd[1] ))
+				coefficient_diffusion_1 = math.pow(10,math.log10(self.shift_tamsd[1,i,0]) - scaling_exponent_1*math.log10( time_tamsd[1] ))
 
-			self.frame_global[i,37] = scaling_exponent_1
-			self.frame_global[i,38] = coefficient_diffusion_1
+				self.frame_global[i,28] = xrest[0][0]
+				self.frame_global[i,29] = math.pow(10, xrest[0][1])
+
+				self.frame_global[i,37] = scaling_exponent_1
+				self.frame_global[i,38] = coefficient_diffusion_1
+			else:
+				self.frame_global[i,28] = math.nan
+				self.frame_global[i,29] = math.nan
+
+				self.frame_global[i,37] = math.nan
+				self.frame_global[i,38] = math.nan
 
 	def setFitTAMME ( self, window = (0,6) ):
 
@@ -518,6 +524,14 @@ class motility :
 			self.frame_global[i,48] = scaling_exponent_1
 			self.frame_global[i,49] = coefficient_diffusion_1
 
+	# getters angels details
+
+	def getAngleOrientationTime ( self, is_shift_zero = False ) :
+		if is_shift_zero :
+			return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, (self.shift_angle[:,:,0] - self.shift_angle[0,:,0])
+		else:
+			return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, self.shift_angle[:,:,0]
+
 	# getters Details
 
 	def getAllDeltaX ( self, is_flat = False ):
@@ -525,7 +539,7 @@ class motility :
 			return self.frame[:,:,2].flatten()[ ~numpy.isnan( self.frame[:,:,2].flatten() ) ]
 		else:
 			#return self.frame[:,:,2]
-			return (numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq - self.time_seq)[1::], (self.shift_pos[1::,:,0] - self.shift_pos[0:-1,:,0])
+			return (numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq - self.time_seq)[1::], (self.shift_pos[1::,:,0] - self.shift_pos[0:-1:,:,0])
 
 	def getAllDeltaY ( self, is_flat = False ):
 		if is_flat :
@@ -546,65 +560,67 @@ class motility :
 	def getAverageY ( self ):
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, numpy.nanmean( self.shift_pos[:,:,1], axis = 1 ), numpy.nanstd( self.shift_pos[:,:,1], axis = 1 )		
 
-	def getAllXPSD ( self ):
+	def getAllAndAvgXPSD ( self, n_points = 50, is_f = False, min_f = None, max_f = None ):
+
+		# f is the requested frequency
+		# signal is the time series data
+		# Fs is the sampling frequency in Hz
+		def Sxx(f, signal, Fs):
+			t = 1/Fs # Sample spacing
+			T = len(signal) # Signal duration
+			s = numpy.sum([signal[i] * numpy.exp(-1j*2*numpy.pi*f*i*t) for i in range(T)])
+			return (t**2 / T ) * numpy.abs(s)**2
 
 		time, xpoint = self.getAllXPath()
+		x_freq = None
 
-		time_psd = numpy.full( xpoint.shape, numpy.nan  )
-		x_psd = numpy.full( xpoint.shape, numpy.nan )
-		for i in range( xpoint.shape[1] ):
-			i_nonnan = numpy.where( ~numpy.isnan( xpoint[:,i] ) )[0]
-			freq, psd = welch( xpoint[i_nonnan,i], 1/(60*self.time_seq), nperseg = len(i_nonnan) )
-
-			time_psd[ 0:len(freq),i ] = freq
-			x_psd[ 0:len(psd),i ] = psd
-
-		return time_psd, x_psd
-
-	def getAverageXPSD ( self, bins = 50 ):
+		if is_f :
+			x_freq = numpy.linspace(min_f, max_f, n_points)
+		else:
+			i_nonnan = numpy.where( ~numpy.isnan( xpoint[:,0] ) )[0]
+			freq, psd = welch( xpoint[i_nonnan,0], 1/(60*self.time_seq), nperseg = len(i_nonnan) )
+			x_freq = numpy.linspace(freq[0],freq[-1], n_points)
 		
-		time, psd = self.getAllXPSD()
-
-		xtime = time.flatten()
-		xpsd = psd.flatten()
-		i_nonnan = numpy.where( ~numpy.isnan(xpsd) )[0]
-				
-		xtime = xtime[ i_nonnan ]
-		xpsd = xpsd[ i_nonnan ]
-
-		ybin, xbin, binnumber = binned_statistic( xtime, xpsd, 'mean', bins = bins )
-
-		return xbin, ybin 
-
-	def getAllYPSD ( self ):
-
-		time, xpoint = self.getAllYPath()
-
-		time_psd = numpy.full( xpoint.shape, numpy.nan  )
-		x_psd = numpy.full( xpoint.shape, numpy.nan )
+		x_psd = numpy.full( (n_points,xpoint.shape[1]), numpy.nan )
 		for i in range( xpoint.shape[1] ):
 			i_nonnan = numpy.where( ~numpy.isnan( xpoint[:,i] ) )[0]
-			freq, psd = welch( xpoint[i_nonnan,i], 1/(60*self.time_seq), nperseg = len(i_nonnan) )
 
-			time_psd[ 0:len(freq),i ] = freq
-			x_psd[ 0:len(psd),i ] = psd
+			S = [Sxx(f, xpoint[i_nonnan,i], 1/(60*self.time_seq) ) for f in x_freq ]
 
-		return time_psd, x_psd
+			x_psd[:,i] = S
 
-	def getAverageYPSD ( self ):
+		return x_freq, x_psd, numpy.nanmean( x_psd, axis = 1 ), numpy.nanstd( x_psd, axis = 1 )
 
-		time, psd = self.getAllYPSD()
+	def getAllAndAvgYPSD ( self, n_points = 50, is_f = False, min_f = None, max_f = None ):
 
-		xtime = time.flatten()
-		xpsd = psd.flatten()
-		i_nonnan = numpy.where( ~numpy.isnan(xpsd) )[0]
-				
-		xtime = xtime[ i_nonnan ]
-		xpsd = xpsd[ i_nonnan ]
+		# f is the requested frequency
+		# signal is the time series data
+		# Fs is the sampling frequency in Hz
+		def Sxx(f, signal, Fs):
+			t = 1/Fs # Sample spacing
+			T = len(signal) # Signal duration
+			s = numpy.sum([signal[i] * numpy.exp(-1j*2*numpy.pi*f*i*t) for i in range(T)])
+			return (t**2 / T ) * numpy.abs(s)**2
 
-		ybin, xbin, binnumber = binned_statistic( xtime, xpsd, 'mean', bins = bins )
+		time, ypoint = self.getAllYPath()
+		y_freq = None
 
-		return xbin, ybin
+		if is_f :
+			y_freq = numpy.linspace(min_f, max_f, n_points)
+		else:
+			i_nonnan = numpy.where( ~numpy.isnan( ypoint[:,0] ) )[0]
+			freq, psd = welch( ypoint[i_nonnan,0], 1/(60*self.time_seq), nperseg = len(i_nonnan) )
+			y_freq = numpy.linspace(freq[0],freq[-1], n_points)
+
+		y_psd = numpy.full( (n_points,ypoint.shape[1]), numpy.nan )
+		for i in range( ypoint.shape[1] ):
+			i_nonnan = numpy.where( ~numpy.isnan( ypoint[:,i] ) )[0]
+
+			S = [Sxx(f, ypoint[i_nonnan,i], 1/(60*self.time_seq) ) for f in y_freq ]
+
+			y_psd[:,i] = S
+
+		return y_freq, y_psd, numpy.nanmean( y_psd, axis = 1 ), numpy.nanstd( y_psd, axis = 1 )
 
 	def getAverageFMIxByStep ( self ):
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, numpy.nanmean( self.shift_pos[:,:,0]/self.shift_pos[:,:,3], axis = 1 ), numpy.nanstd( self.shift_pos[:,:,0]/self.shift_pos[:,:,3], axis = 1 )
@@ -624,18 +640,46 @@ class motility :
 		else:
 			return self.frame[:,:,7]
 
-	def getAllVelocityCorrelation ( self ):
+	def getAllNormVelocityCorrelation ( self ):
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, self.shift_corr[:,:,0]
 
-	def getAverageVelocityCorrelation ( self ):
+	def getAverageNormVelocityCorrelation ( self ):
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, numpy.nanmean(self.shift_corr[:,:,0], axis = 1), numpy.nanstd(self.shift_corr[:,:,0], axis = 1)
 
-	def getAverageRealPowerSpectrum ( self ):
+	def getAllVelocityCorrelation ( self ):
+		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, self.shift_corr[:,:,1]
+
+	def getAverageVelocityCorrelation ( self ):
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, numpy.nanmean(self.shift_corr[:,:,1], axis = 1), numpy.nanstd(self.shift_corr[:,:,1], axis = 1)
 
-	def getAverageImgPowerSpectrum ( self ):
-		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, numpy.nanmean(self.shift_corr[:,:,2], axis = 1), numpy.nanstd(self.shift_corr[:,:,2], axis = 1)
+	def getAllVelocityCorrelationPowerSpectrum ( self ):
+		time, xpoint = self.getAllVelocityCorrelation()
 
+		time_psd = numpy.full( xpoint.shape, numpy.nan  )
+		x_psd = numpy.full( xpoint.shape, numpy.nan )
+		for i in range( xpoint.shape[1] ):
+			i_nonnan = numpy.where( ~numpy.isnan( xpoint[:,i] ) )[0]
+			freq, psd = welch( xpoint[i_nonnan,i], 1/(60*self.time_seq), nperseg = len(i_nonnan), scaling = 'spectrum' )
+
+			time_psd[ 0:len(freq),i ] = freq
+			x_psd[ 0:len(psd),i ] = psd
+
+		return time_psd, x_psd
+
+	def getAverageVelocityCorrelationPowerSpectrum ( self, bins = 50 ):
+		time, psd = self.getAllVelocityCorrelationPowerSpectrum()
+
+		xtime = time.flatten()
+		xpsd = psd.flatten()
+		i_nonnan = numpy.where( ~numpy.isnan(xpsd) )[0]
+				
+		xtime = xtime[ i_nonnan ]
+		xpsd = xpsd[ i_nonnan ]
+
+		ybin, xbin, binnumber = binned_statistic( xtime, xpsd, 'mean', bins = bins )
+
+		return xbin, ybin
+	
 	def getDataPersistenceTime ( self ):
 
 		data = []
@@ -664,10 +708,12 @@ class motility :
 	def getAllDifferenceAngleOrientation( self ):
 		return (self.frame[1:self.frame.shape[0]-1,:,10] - self.frame[0:self.frame.shape[0]-2,:,10])
 
-	def getPackingCoefficient ( self, length_window = 5 ):
+	def getPackingCoefficient ( self, length_window = 5, threshold = None ):
 
 		cols = numpy.where( numpy.sum( ~numpy.isnan(self.shift_pos[:,:,0]), axis = 0 ) >= (2*length_window) )[0]
 		pc = numpy.full( ( self.shift_pos.shape[0], len(cols) ) , numpy.nan )
+		wait_time = []
+		count_cell_with_wait_time = 0
 		for i in cols:
 			distance = numpy.power( self.shift_pos[1::,i,0] - self.shift_pos[0:-1:,i,0],2 ) + numpy.power( self.shift_pos[1::,i,1] - self.shift_pos[0:-1:,i,1],2 )
 			power_hull = []
@@ -681,7 +727,27 @@ class motility :
 			rs = numpy.convolve( distance[0:len(power_hull):]/power_hull, numpy.ones(length_window), mode='valid' )
 			pc[0:len(rs):,i] = rs
 
-		return numpy.arange(0, pc.shape[0], 1, dtype = int)*self.time_seq, pc, cols
+			if threshold :
+				count_time = 0
+				list_time = []
+				item_threshold = rs >= threshold
+				if numpy.sum( item_threshold ) > 1 :
+					count_cell_with_wait_time = count_cell_with_wait_time + 1
+
+				for j in range( len(item_threshold) - 1 ):
+					if item_threshold[j] == True and item_threshold[j+1] == True :
+						count_time = count_time + 1
+					else:
+						if count_time > 0:
+							list_time.append( count_time*self.time_seq )
+
+						count_time = 0
+				if count_time > 0:
+					list_time.append( count_time*self.time_seq )
+
+				wait_time.append( list_time )
+
+		return numpy.arange(0, pc.shape[0], 1, dtype = int)*self.time_seq, pc, cols, wait_time, (count_cell_with_wait_time/self.shift_pos.shape[1])
 
 	# MME, MSD & TAMSD
 
@@ -700,12 +766,48 @@ class motility :
 
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)[1::]*self.time_seq, numpy.array(avg_mme)[1::], numpy.array(std_mme)[1::]
 
+	def getXMME ( self ):
+		avg_mme = []
+		std_mme = []
+		for i in range( self.shift_pos.shape[0] ):
+			r_max = numpy.nanmax( numpy.power(self.shift_pos[0:i+1,:,0] - self.shift_pos[0,:,0],2) , axis = 0 )
+			n_traj = numpy.sum( ~numpy.isnan( self.shift_pos[i,:,0] ) )
+			if n_traj <= 0 :
+				avg_mme.append( math.nan )
+				std_mme.append( math.nan )
+			else:
+				avg_mme.append( numpy.sum(r_max)/n_traj )
+				std_mme.append( numpy.sum( numpy.power( r_max - numpy.sum(r_max)/n_traj,2 ) )/n_traj ) 
+
+		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)[1::]*self.time_seq, numpy.array(avg_mme)[1::], numpy.array(std_mme)[1::]
+
+	def getYMME ( self ):
+		avg_mme = []
+		std_mme = []
+		for i in range( self.shift_pos.shape[0] ):
+			r_max = numpy.nanmax( numpy.power( self.shift_pos[0:i+1,:,1] - self.shift_pos[0,:,1], 2), axis = 0 )
+			n_traj = numpy.sum( ~numpy.isnan( self.shift_pos[i,:,0] ) )
+			if n_traj <= 0 :
+				avg_mme.append( math.nan )
+				std_mme.append( math.nan )
+			else:
+				avg_mme.append( numpy.sum(r_max)/n_traj )
+				std_mme.append( numpy.sum( numpy.power( r_max - numpy.sum(r_max)/n_traj,2 ) )/n_traj ) 
+
+		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)[1::]*self.time_seq, numpy.array(avg_mme)[1::], numpy.array(std_mme)[1::]
+
 	def getAllTAMME ( self ):
 
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)[1::]*self.time_seq, self.shift_tamme[1::,:]
 
 	def getMSD ( self ):
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)[1::]*self.time_seq, numpy.nanmean( numpy.power(self.shift_pos[:,:,0] - self.shift_pos[0,:,0],2) + numpy.power( self.shift_pos[:,:,1] - self.shift_pos[0,:,1], 2), axis = 1)[1::], numpy.nanstd( numpy.power(self.shift_pos[:,:,0] - self.shift_pos[0,:,0],2) + numpy.power( self.shift_pos[:,:,1] - self.shift_pos[0,:,1], 2), axis = 1)[1::]
+
+	def getXMSD ( self ):
+		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)[1::]*self.time_seq, numpy.nanmean( numpy.power(self.shift_pos[:,:,0] - self.shift_pos[0,:,0],2) , axis = 1)[1::], numpy.nanstd( numpy.power(self.shift_pos[:,:,0] - self.shift_pos[0,:,0],2) , axis = 1)[1::]
+
+	def getYMSD ( self ):
+		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)[1::]*self.time_seq, numpy.nanmean( numpy.power( self.shift_pos[:,:,1] - self.shift_pos[0,:,1], 2), axis = 1)[1::], numpy.nanstd( numpy.power( self.shift_pos[:,:,1] - self.shift_pos[0,:,1], 2), axis = 1)[1::]
 
 	def getAllTAMSD ( self ):
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)[1::]*self.time_seq, self.shift_tamsd[1::,:,0]
@@ -771,21 +873,35 @@ class motility :
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)[1::]*self.time_seq, numpy.array(avg_mme_4)[1::]/(numpy.power(avg_mme,2)[1::])
 
 	def getXAverageMixingBreakingDynamicalFunctionalTest ( self ):
-
+		'''
 		D = numpy.nanmean( numpy.exp( 1j*( self.shift_pos[:,:,0] - self.shift_pos[0,:,0] ) ), axis = 1 )
 		a = numpy.power( numpy.abs( numpy.nanmean( numpy.exp( 1j*self.shift_pos[0,:,0] ) ) ), 2)
 
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, (D-a), numpy.cumsum( D - a )/(numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq)
+		'''
+
+		time, increments = self.getAllDeltaX();
+		D_i = numpy.exp( 1j*( increments[:,:] - increments[0,:] ) )
+		D = numpy.nanmean( D_i , axis = 1 )
+		a = numpy.power( numpy.abs( numpy.nanmean( numpy.exp( 1j*increments[0,:] ) ) ), 2)
+
+		return numpy.arange(0, increments.shape[0], 1, dtype = int)*self.time_seq, (D-a), numpy.cumsum( D - a )/(numpy.arange(0, increments.shape[0], 1, dtype = int)*self.time_seq)
 
 	def getYAverageMixingBreakingDynamicalFunctionalTest ( self ):
-
+		'''
 		D = numpy.nanmean( numpy.exp( 1j*(self.shift_pos[:,:,1] - self.shift_pos[0,:,1]) ), axis = 1 )
 		a = numpy.power( numpy.abs( numpy.nanmean( numpy.exp( 1j*self.shift_pos[0,:,1] ) ) ), 2)
 
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, (D-a), numpy.cumsum( D - a )/(numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq)
+		'''
+		time, increments = self.getAllDeltaY();
+		D = numpy.nanmean( numpy.exp( 1j*( increments[:,:] - increments[0,:] ) ), axis = 1 )
+		a = numpy.power( numpy.abs( numpy.nanmean( numpy.exp( 1j*increments[0,:] ) ) ), 2)
+
+		return numpy.arange(0, increments.shape[0], 1, dtype = int)*self.time_seq, (D-a), numpy.cumsum( D - a )/(numpy.arange(0, increments.shape[0], 1, dtype = int)*self.time_seq)
 
 	def getXAllMixingBreakingDynamicalFunctionalTest ( self ):
-
+		'''
 		mixingergo = numpy.full( ( self.shift_pos.shape[0], self.shift_pos.shape[1] ), numpy.nan )
 
 		for i in range( self.shift_pos.shape[1] ):
@@ -802,9 +918,28 @@ class motility :
 				mixingergo[i_nonnan[j],i] = (D/(len(i_nonnan) - j)) - a
 
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, mixingergo, ((numpy.cumsum( mixingergo, axis = 0 ).T)/ (numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq)).T
+		'''
+
+		time, increments = self.getAllDeltaX()
+
+		mixingergo = numpy.full( ( increments.shape[0], increments.shape[1] ), numpy.nan )
+
+		n_points = numpy.nansum( ~numpy.isnan( increments ), axis = 0 )
+		a = numpy.power( numpy.abs( numpy.nansum( numpy.exp( 1j*increments ), axis = 0 )/n_points ), 2)
+		
+		for i in range( increments.shape[1] ):
+			i_nonnan = numpy.where( ~numpy.isnan(increments[:,i]) )[0]
+			
+			for j in range( len(i_nonnan) ):
+				D = 0
+				for k in range( 0, len(i_nonnan) - j ):
+					D = D + numpy.exp( 1j*(increments[i_nonnan[k+j],i] - increments[i_nonnan[k],i]) )
+				mixingergo[i_nonnan[j],i] = (D/(len(i_nonnan) - j)) - a[i]
+
+		return numpy.arange(0, increments.shape[0], 1, dtype = int)*self.time_seq, mixingergo, ((numpy.cumsum( mixingergo, axis = 0 ).T)/ (numpy.arange(0, increments.shape[0], 1, dtype = int)*self.time_seq)).T
 
 	def getYAllMixingBreakingDynamicalFunctionalTest ( self ):
-
+		'''
 		mixingergo = numpy.full( ( self.shift_pos.shape[0], self.shift_pos.shape[1] ), numpy.nan )
 
 		for i in range( self.shift_pos.shape[1] ):
@@ -821,6 +956,25 @@ class motility :
 				mixingergo[i_nonnan[j],i] = (D/(len(i_nonnan) - j)) - a
 
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, mixingergo, ((numpy.cumsum( mixingergo, axis = 0 ).T)/ (numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq)).T
+		'''
+
+		time, increments = self.getAllDeltaY()
+
+		mixingergo = numpy.full( ( increments.shape[0], increments.shape[1] ), numpy.nan )
+
+		n_points = numpy.nansum( ~numpy.isnan( increments ), axis = 0 )
+		a = numpy.power( numpy.abs( numpy.nansum( numpy.exp( 1j*increments ), axis = 0 )/n_points ), 2)
+		
+		for i in range( increments.shape[1] ):
+			i_nonnan = numpy.where( ~numpy.isnan(increments[:,i]) )[0]
+			
+			for j in range( len(i_nonnan) ):
+				D = 0
+				for k in range( 0, len(i_nonnan) - j ):
+					D = D + numpy.exp( 1j*(increments[i_nonnan[k+j],i] - increments[i_nonnan[k],i]) )
+				mixingergo[i_nonnan[j],i] = (D/(len(i_nonnan) - j)) - a[i]
+
+		return numpy.arange(0, increments.shape[0], 1, dtype = int)*self.time_seq, mixingergo, ((numpy.cumsum( mixingergo, axis = 0 ).T)/ (numpy.arange(0, increments.shape[0], 1, dtype = int)*self.time_seq)).T
 
 	# getter ageing
 
@@ -940,8 +1094,12 @@ class motility :
 		return self.frame_global[:,6]
 
 	# confinement ratio or persistence ratio
-	def getGlobalPersistenceRatio ( self ):
-		return self.frame_global[:,8]
+	def getGlobalPersistenceRatio ( self, is_not_nan = False ):
+		if is_not_nan :
+			i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,8]) )[0]
+			return self.frame_global[i_nonnan,8]
+		else:
+			return self.frame_global[:,8]
 
 	# directionality ratio
 	def getGlobalDirectionalityRatio ( self, is_not_nan = False ):
@@ -964,12 +1122,20 @@ class motility :
 		return self.frame_global[:,20]
 
 	# x FMI
-	def getGlobalXFMI ( self ):
-		return self.frame_global[:,10]
+	def getGlobalXFMI ( self, is_not_nan = False):
+		if is_not_nan :
+			i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,10]) )[0]
+			return self.frame_global[i_nonnan,10]
+		else:
+			return self.frame_global[:,10]
 
 	# y FMI
-	def getGlobalYFMI ( self ):
-		return self.frame_global[:,11]
+	def getGlobalYFMI ( self, is_not_nan = False ):
+		if is_not_nan :
+			i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,11]) )[0]
+			return self.frame_global[i_nonnan,11]
+		else:
+			return self.frame_global[:,11]
 
 	# mean straight-line speed
 	def getGlobalMeanStraightLineSpeed ( self ):
@@ -996,12 +1162,20 @@ class motility :
 		return self.frame_global[:,17]
 
 	# hull perimeter
-	def getGlobalHullPerimeter ( self ):
-		return self.frame_global[:,21]
+	def getGlobalHullPerimeter ( self, is_not_nan = False ):
+		if is_not_nan :
+			i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,21]) )[0]
+			return self.frame_global[i_nonnan,21]
+		else:
+			return self.frame_global[:,21]
 
 	# hull area
-	def getGlobalHullArea ( self ):
-		return self.frame_global[:,22]
+	def getGlobalHullArea ( self, is_not_nan = False ):
+		if is_not_nan :
+			i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,22]) )[0]
+			return self.frame_global[i_nonnan,22]
+		else:
+			return self.frame_global[:,22]
 
 	# acircularity
 	def getGlobalAcircularity ( self ):
@@ -1028,12 +1202,20 @@ class motility :
 		return self.frame_global[i_nonnan,27]
 
 	# get scaling exponent fit
-	def getScalingExponentFit ( self ):
-		return self.frame_global[:,28]
+	def getScalingExponentFit ( self, is_not_nan = False ):
+		if is_not_nan :
+			i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,28]) )[0]
+			return self.frame_global[i_nonnan,28]
+		else:
+			return self.frame_global[:,28]
 
 	# get generalised diffusion coeficient
-	def getGeneralisedDiffusionCoefficientFit ( self ):
-		return self.frame_global[:,29]
+	def getGeneralisedDiffusionCoefficientFit ( self, is_not_nan = False ):
+		if is_not_nan :
+			i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,29]) )[0]
+			return self.frame_global[i_nonnan,29]
+		else:
+			return self.frame_global[:,29]
 
 	# get first scaling exponent fit
 	def getFirstScalingExponentFit ( self ):
@@ -1056,7 +1238,17 @@ class motility :
 			split_time = xtime[ int(self.frame_global[i,50])+1+window[0]:int(self.frame_global[i,50])+1+window[1] ] - xtime[ int(self.frame_global[i,50]) ]
 			split_average = xtamsd[ int(self.frame_global[i,50])+1+window[0]:int(self.frame_global[i,50])+1+window[1],i ]
 
-			xrest = curve_fit( fit_tamsd, numpy.log10(split_time), numpy.log10(split_average) )
+			log_time = numpy.log10(split_time)
+			log_average = numpy.log10(split_average)
+
+			i_nonnan = numpy.where( ~numpy.isnan(log_average) )[0]
+			log_time = log_time[ i_nonnan ]
+			log_average = log_average[ i_nonnan ]
+			i_noninf = numpy.where( ~numpy.isinf(log_average) )[0]
+			log_time = log_time[ i_noninf ]
+			log_average = log_average[ i_noninf ]
+
+			xrest = curve_fit( fit_tamsd, log_time, log_average )
 			
 			xexponent.append( xrest[0][0] )
 			xcoefficient.append( math.pow(10, xrest[0][1]) )
@@ -1076,7 +1268,17 @@ class motility :
 			split_time = xtime[ int(self.frame_global[i,50])+1+window[0]:int(self.frame_global[i,50])+1+window[1] ] - xtime[ int(self.frame_global[i,50]) ]
 			split_average = xtamsd[ int(self.frame_global[i,50])+1+window[0]:int(self.frame_global[i,50])+1+window[1],i ]
 
-			xrest = curve_fit( fit_tamsd, numpy.log10(split_time), numpy.log10(split_average) )
+			log_time = numpy.log10(split_time)
+			log_average = numpy.log10(split_average)
+
+			i_nonnan = numpy.where( ~numpy.isnan(log_average) )[0]
+			log_time = log_time[ i_nonnan ]
+			log_average = log_average[ i_nonnan ]
+			i_noninf = numpy.where( ~numpy.isinf(log_average) )[0]
+			log_time = log_time[ i_noninf ]
+			log_average = log_average[ i_noninf ]
+
+			xrest = curve_fit( fit_tamsd, log_time, log_average )
 			
 			xexponent.append( xrest[0][0] )
 			xcoefficient.append( math.pow(10, xrest[0][1]) )
