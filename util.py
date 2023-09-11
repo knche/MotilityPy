@@ -69,9 +69,10 @@ class util :
 
 		return plt
 
-	def scheme_scatter ( self, is_multi = False, ylim = None, vlines_x = [], is_binned = False, bins = 20, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_axis_equal = False, alpha = 0.2, marker = 'o', markersize = 100, size = (12,5), is_color = False, xdata = [], ydata = [], xlabel = '', ylabel = '', is_legend = False, xscale = 'linear', yscale = 'linear' ) :
+	def scheme_scatter ( self, is_multi = False, ylim = None, vlines_x = [], is_binned = False, bins = 20, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_axis_equal = False, alpha = 0.2, marker = 'o', markersize = 100, size = (12,5), is_color = False, data_color = None, xdata = [], ydata = [], xlabel = '', ylabel = '', is_legend = False, xscale = 'linear', yscale = 'linear' ) :
 
 		xwindow = [window]*len(xdata) if type(window) is not list else window
+		xmarkersize = [markersize]*len(xdata) if type(markersize) is not list else markersize
 
 		plt.figure( figsize = size )
 
@@ -89,13 +90,17 @@ class util :
 
 			xcolor = self._colors[i]
 			if is_color :
-				xcolor = None
+				if data_color :
+					xcolor = data_color if type(data_color) is not list else data_color[i]
+				else:
+					xcolor = None
 
 			if not is_multi and is_fit and is_fit_all and i > 0:
 				multi_data = numpy.concatenate( ( multi_data, numpy.stack( ( xdata[i], ydata[i] ), axis = -1 ) ), axis = 0 )
 
 			temp_x = xdata[i]
 			temp_y = ydata[i]
+
 			if xscale == 'log' and yscale == 'linear':
 				i_nonneg = numpy.where( temp_x > 0 )[0]
 				temp_x = temp_x[ i_nonneg ]
@@ -111,9 +116,6 @@ class util :
 				i_nonneg = numpy.where( temp_y > 0 )[0]
 				temp_x = temp_x[ i_nonneg ]
 				temp_y = temp_y[ i_nonneg ]
-			
-			ymin = numpy.amin( temp_y )
-			ymax = numpy.amax( temp_y )
 
 			xvline_per = []
 			for i_xline in range( len(vlines_x) ) :
@@ -131,8 +133,7 @@ class util :
 					xvline_per.append( xline_shape[0]*100/temp_x.shape[0] )
 
 			vlines_per.append( xvline_per )
-
-			plt.scatter( temp_x, temp_y, c = xcolor, label = self._names[i], alpha = alpha, s = markersize, marker = marker )
+			plt.scatter( temp_x, temp_y, c = xcolor, label = self._names[i], alpha = alpha, s = xmarkersize[i], marker = marker )
 			
 			if is_multi and is_binned :
 				ybin, xbin, binnumber = stats.binned_statistic( xdata[i], ydata[i], 'mean', bins = bins )
@@ -544,10 +545,17 @@ class util :
 
 		return info, plt
 		
-	def scheme_plot_fill ( self, is_fig = True, is_multi = False, is_axis_equal = False, size = (12,5), is_color = False, xdata = [], ydata = [], ystd = [], xscale = 'linear', yscale = 'linear', xlabel = '', ylabel = '', is_legend = False ):
+	def scheme_plot_fill ( self, is_fig = True, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, ylim = None, xlim = None, is_axis_equal = False, size = (12,5), is_color = False, xdata = [], ydata = [], ystd = [], xscale = 'linear', yscale = 'linear', xlabel = '', ylabel = '', is_legend = False ):
+
+		xwindow = [window]*len(xdata) if type(window) is not list else window
 
 		if is_fig :
 			plt.figure( figsize = size )
+
+		info_fit = []
+		multi_data = []
+		if not is_multi and is_fit and is_fit_all and len(xdata)>0:
+			multi_data = numpy.stack( ( xdata[0], ydata[0] ), axis = -1 )
 
 		for i in range( len(xdata) ):
 			if is_multi :
@@ -556,13 +564,128 @@ class util :
 			xcolor = self._colors[i]
 			if is_color :
 				xcolor = None
+			
 			plt.plot( xdata[i], ydata[i], color = xcolor, label = self._names[i] )
+			if not is_multi and is_fit and is_fit_all and i > 0:
+				multi_data = numpy.concatenate( ( multi_data, numpy.stack( ( xdata[i], ydata[i] ), axis = -1 ) ), axis = 0 )
+
 			if len(ystd) > 0 :
 				plt.fill_between( xdata[i], ydata[i] - ystd[i], ydata[i] + ystd[i], color = xcolor, alpha = 0.2 )
 
+			if is_fit and not is_fit_all:
+
+				xfit, yfit = self.__UtilClearXY( xdata[i], ydata[i] )
+				if xwindow[i] :
+					xfit = xdata[i][xwindow[i][0]:xwindow[i][1]] if xwindow[i] else xdata[i]
+					yfit = ydata[i][xwindow[i][0]:xwindow[i][1]] if xwindow[i] else ydata[i]
+				
+				if type_fit == 'linear' :
+					def fit_linear ( x, m, c ):
+						return x*m + c
+					xrest = curve_fit( fit_linear, xfit, yfit )
+					bins_edges = numpy.linspace( numpy.min(xfit), numpy.max(xfit), 100 )
+					plt.plot( bins_edges, xrest[0][0]*bins_edges + xrest[0][1], color = self._colors[i], linestyle =':', lw = 2 )
+
+					info_fit.append( { 'slope' : xrest[0][0], 'intersection' : xrest[0][1], 'pearson': pearsonr( xfit, yfit )} )
+				elif type_fit == 'bilinear':
+
+					xfit_1 = xdata[i][xwindow[i][0][0]:xwindow[i][0][1]] if xwindow[i] else xdata[i]
+					yfit_1 = ydata[i][xwindow[i][0][0]:xwindow[i][0][1]] if xwindow[i] else ydata[i]
+
+					xfit_2 = xdata[i][xwindow[i][1][0]:xwindow[i][1][1]] if xwindow[i] else xdata[i]
+					yfit_2 = ydata[i][xwindow[i][1][0]:xwindow[i][1][1]] if xwindow[i] else ydata[i]
+
+					xfit_1, yfit_1 = self.__UtilClearXY( xfit_1, yfit_1 )
+					xfit_2, yfit_2 = self.__UtilClearXY( xfit_2, yfit_2 )
+
+					bins_edges_1 = numpy.linspace( numpy.min(xfit_1), numpy.max(xfit_1), 50 )
+					bins_edges_2 = numpy.linspace( numpy.min(xfit_2), numpy.max(xfit_2), 50 )
+
+					xrest_1 = linregress( xfit_1, yfit_1 )
+					xrest_2 = linregress( xfit_2, yfit_2 )
+
+					plt.plot( bins_edges_1, xrest_1.slope*bins_edges_1 + xrest_1.intercept, color = self._colors[i], linestyle ='--', lw = 2 )
+					plt.plot( bins_edges_2, xrest_2.slope*bins_edges_2 + xrest_2.intercept, color = self._colors[i], linestyle =':', lw = 2 )
+
+					info_fit.append( { 'slope 1' : xrest_1.slope, 'intersection 1' : xrest_1.intercept, 'pearson 1': pearsonr( xfit_1, yfit_1 ), 'slope 2' : xrest_2.slope, 'intersection 2' : xrest_2.intercept, 'pearson 2': pearsonr( xfit_2, yfit_2 )} )
+
+				elif type_fit == 'powerlaw':
+					def fit_powerlaw ( x, m, c ):
+						return x*m + c
+					xfitlog, yfitlog = self.__UtilClearXY( numpy.log10(xfit), numpy.log10(yfit) )
+					xrest = curve_fit( fit_powerlaw, xfitlog, yfitlog )
+					bins_edges = numpy.linspace( numpy.min(xfit), numpy.max(xfit), 100 )
+					plt.plot( bins_edges,  numpy.power(bins_edges, xrest[0][0] )*math.pow(10, xrest[0][1]), linestyle = ':', color = self._colors[i], lw = 2 )
+					
+					info_fit.append( { 'slope' : xrest[0][0], 'const' : math.pow(10, xrest[0][1]), 'pearson': pearsonr( xfitlog, yfitlog )} )
+				elif type_fit == 'bipowerlaw':
+
+					xfit_1 = xdata[i][xwindow[i][0][0]:xwindow[i][0][1]] if xwindow[i] else xdata[i]
+					yfit_1 = ydata[i][xwindow[i][0][0]:xwindow[i][0][1]] if xwindow[i] else ydata[i]
+
+					xfit_2 = xdata[i][xwindow[i][1][0]:xwindow[i][1][1]] if xwindow[i] else xdata[i]
+					yfit_2 = ydata[i][xwindow[i][1][0]:xwindow[i][1][1]] if xwindow[i] else ydata[i]
+
+					xfit_1, yfit_1 = self.__UtilClearXY( xfit_1, yfit_1 )
+					xfit_2, yfit_2 = self.__UtilClearXY( xfit_2, yfit_2 )
+
+					bins_edges_1 = numpy.linspace( numpy.min(xfit_1), numpy.max(xfit_1), 50 )
+					bins_edges_2 = numpy.linspace( numpy.min(xfit_2), numpy.max(xfit_2), 50 )
+
+					xrest_1 = linregress( numpy.log10(xfit_1), numpy.log10(yfit_1) )
+					xrest_2 = linregress( numpy.log10(xfit_2), numpy.log10(yfit_2) )
+
+					plt.plot( bins_edges_1, numpy.power(bins_edges_1, xrest_1.slope )*math.pow(10, xrest_1.intercept), color = self._colors[i], linestyle ='--', lw = 2 )
+					plt.plot( bins_edges_2, numpy.power(bins_edges_2, xrest_2.slope )*math.pow(10, xrest_2.intercept), color = self._colors[i], linestyle =':', lw = 2 )
+
+					info_fit.append( { 'slope 1' : xrest_1.slope, 'const 1' : math.pow(10, xrest_1.intercept), 'pearson 1': pearsonr( numpy.log10(xfit_1), numpy.log10(yfit_1) ), 'slope 2' : xrest_2.slope, 'const 2' : math.pow(10, xrest_2.intercept), 'pearson 2': pearsonr( numpy.log10(xfit_2), numpy.log10(yfit_2) )} )
+
+				elif type_fit == 'powerlawlin':
+					def fit_powerlaw ( x, m, c ):
+						return (x**m)*c
+					xrest = curve_fit( fit_powerlaw, xfit, yfit )
+					bins_edges = numpy.linspace( numpy.min(xfit), numpy.max(xfit), 100 )
+					plt.plot( bins_edges,  numpy.power(bins_edges, xrest[0][0] )*xrest[0][1], linestyle = ':', color = self._colors[i], lw = 2 )
+					
+					xfit = numpy.log10(xfit)
+					yfit = numpy.log10(yfit)
+					i_noninf = numpy.where( ~numpy.isinf(yfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(yfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+					i_noninf = numpy.where( ~numpy.isinf(xfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(xfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+
+					info_fit.append( { 'slope' : xrest[0][0], 'const' : xrest[0][1], 'pearson': pearsonr( xfit, yfit ) } )
+				elif type_fit == 'exponential':
+					def fit_exponential ( x, m, c ):
+						return x*m*math.log10(math.e) + c
+					yfit = numpy.log10(yfit)
+					i_noninf = numpy.where( ~numpy.isinf(yfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(yfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+					xrest = curve_fit( fit_exponential, xfit, yfit )
+					bins_edges = numpy.linspace( numpy.min(xfit), numpy.max(xfit), 100 )
+					plt.plot( bins_edges,  numpy.exp( xrest[0][0]*bins_edges)*math.pow(10, xrest[0][1]), linestyle = ':', color = self._colors[i], lw = 2 )
+					
+					info_fit.append( { 'exponent' : xrest[0][0], 'const' : math.pow(10, xrest[0][1]), 'pearson': pearsonr( xfit, yfit )} )
+
 			if is_multi :
 				if is_axis_equal :
-					plt.axis('equal')
+					plt.axis('scaled')
+				if ylim :
+					plt.ylim( ylim )
+				if xlim :
+					plt.xlim( xlim )
 				if is_legend :
 					plt.title( self._names[i], fontdict = {'fontsize':self._font_size} )
 				plt.xscale( xscale )
@@ -574,8 +697,65 @@ class util :
 				plt.grid( linestyle = ':' )
 
 		if not is_multi:
+
+			if is_fit and is_fit_all :
+				
+				xfit, yfit = self.__UtilClearXY( multi_data[:,0], multi_data[:,1] )
+
+				xedge = numpy.linspace( numpy.min(xfit), numpy.max(xfit), 100 )
+				if type_fit == 'linear' :
+					def fit_linear ( x, m, c ):
+						return x*m + c
+					xrest = curve_fit( fit_linear, xfit, yfit )
+					plt.plot( xedge, xrest[0][0]*xedge + xrest[0][1], color = 'black', linestyle =':', lw = 2 )
+
+					info_fit.append( { 'slope' : xrest[0][0], 'intersection' : xrest[0][1], 'pearson': pearsonr( xfit, yfit )} )
+
+				elif type_fit == 'powerlaw':
+					def fit_powerlaw ( x, m, c ):
+						return x*m + c
+					
+					xfit = numpy.log10(xfit)
+					yfit = numpy.log10(yfit)
+					i_noninf = numpy.where( ~numpy.isinf(yfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(yfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+					i_noninf = numpy.where( ~numpy.isinf(xfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(xfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+
+					xrest = curve_fit( fit_powerlaw, xfit, yfit )
+					plt.plot( xedge,  numpy.power(xedge, xrest[0][0] )*math.pow(10, xrest[0][1]), linestyle = ':', color = 'black', lw = 2 )
+					
+					info_fit.append( { 'slope' : xrest[0][0], 'const' : math.pow(10, xrest[0][1]), 'pearson': pearsonr( xfit, yfit ) } )
+				elif type_fit == 'exponential':
+					def fit_exponential ( x, m, c ):
+						return x*m*math.log10(math.e) + c
+					yfit = numpy.log10(yfit)
+					i_noninf = numpy.where( ~numpy.isinf(yfit) )[0]
+					xfit = xfit[i_noninf]
+					yfit = yfit[i_noninf]
+					i_nonnan = numpy.where( ~numpy.isnan(yfit) )[0]
+					xfit = xfit[i_nonnan]
+					yfit = yfit[i_nonnan]
+					xrest = curve_fit( fit_exponential, xfit, yfit )
+					plt.plot( xedge,  numpy.exp( xrest[0][0]*xedge)*math.pow(10, xrest[0][1]), linestyle = ':', color = 'black', lw = 2 )
+					
+					info_fit.append( { 'exponent' : xrest[0][0], 'const' : math.pow(10, xrest[0][1]), 'pearson': pearsonr( xfit, yfit )} )
+
+
 			if is_axis_equal :
-				plt.axis('equal')
+				plt.axis('scaled')
+			if ylim :
+				plt.ylim( ylim )
+			if xlim :
+				plt.xlim( xlim )
 			plt.xscale( xscale )
 			plt.yscale( yscale )
 			plt.xticks( fontsize = self._font_size )
@@ -588,7 +768,7 @@ class util :
 		else:
 			plt.tight_layout()
 
-		return plt
+		return info_fit, plt
 
 	def scheme_hist ( self, data = [], bins = 10, ylim = None, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', density = False, xlabel = '', ylabel = '', is_multi = False, is_legend = False ):
 

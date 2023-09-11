@@ -1183,13 +1183,15 @@ class motility :
 
 	# mass center orientation
 	def getGlobalMassCenterOrientation ( self ):
-		i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,24]) )[0]
-		return self.frame_global[i_nonnan,24]
+		#i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,24]) )[0]
+		#return self.frame_global[i_nonnan,24]
+		return self.frame_global[:,24]
 
 	# first orientation cell body
 	def getGlobalFirstOrientationCellBody ( self ):
-		i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,25]) )[0]
-		return self.frame_global[i_nonnan,25]
+		#i_nonnan = numpy.where( ~numpy.isnan(self.frame_global[:,25]) )[0]
+		#return self.frame_global[i_nonnan,25]
+		return self.frame_global[:,25]
 
 	# max view angle 
 	def getGlobalMaxViewAngle ( self ):
