@@ -51,6 +51,8 @@ class multi_graph :
 	def setColors ( self, colors = [] ):
 		self._colors = colors
 		self._util.setColors( colors = colors )
+	def setTypeTest ( self, type_test = "student" ):
+		self._util.setTypeTest( type_test = "student" )
 	def setIntervalAxisPlot ( self, interval_axis_plot = 6 ):
 		self._interval_axis_plot = interval_axis_plot
 		self._util.setIntervalAxisPlot( interval_axis_plot )
@@ -82,7 +84,7 @@ class multi_graph :
 
 	# tracking
 	
-	def showCellXTimeTracking ( self, is_color = False, is_legend = False ):
+	def showCellXTimeTracking ( self, is_vertical = False, is_color = False, is_legend = False, ylim = None, xlim = None, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xpoint = []
@@ -91,9 +93,9 @@ class multi_graph :
 			xtime.append( time )
 			xpoint.append( point )
 
-		return self._util.scheme_plot_fill( xdata = xtime, ydata = xpoint, ystd = [], xlabel = 't (min)', ylabel = '$x \; (\mu m)$', size = (6*len(xpoint),5), is_multi = True, is_color = is_color, is_legend = is_legend )
+		return self._util.scheme_plot_fill( xdata = xtime, ydata = xpoint, ylim = ylim, xlim = xlim, ystd = [], xlabel = 't (min)', ylabel = '$x \; (\mu m)$', size = ( (6,5*len(xpoint)) if is_vertical else (6*len(xpoint),5) ), is_multi = True, is_vertical = is_vertical, is_color = is_color, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showCellYTimeTracking ( self, is_color = False, is_legend = False ):
+	def showCellYTimeTracking ( self, is_vertical = False, is_color = False, is_legend = False, ylim = None, xlim = None, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		ytime = []
 		ypoint = []
@@ -102,9 +104,9 @@ class multi_graph :
 			ytime.append( time )
 			ypoint.append( point )
 
-		return self._util.scheme_plot_fill( xdata = ytime, ydata = ypoint, ystd = [], xlabel = 't (min)', ylabel = '$y \; (\mu m)$', size = (6*len(ypoint),5), is_multi = True, is_color = is_color, is_legend = is_legend )
+		return self._util.scheme_plot_fill( xdata = ytime, ydata = ypoint, ylim = ylim, xlim = xlim, ystd = [], xlabel = 't (min)', ylabel = '$y \; (\mu m)$', size = ( (6,5*len(ypoint)) if is_vertical else (6*len(ypoint),5) ) , is_multi = True, is_vertical = is_vertical, is_color = is_color, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showCellXYTracking ( self, is_color = False, is_legend = False, ylim = None, xlim = None, is_axis_equal = True ):
+	def showCellXYTracking ( self, is_vertical = False, is_color = False, is_legend = False, ylim = None, xlim = None, is_axis_equal = True ):
 
 		xtime = []
 		xpoint = []
@@ -118,9 +120,9 @@ class multi_graph :
 			ytime.append( ty )
 			ypoint.append( pty )
 
-		return self._util.scheme_plot_fill( xdata = xpoint, ydata = ypoint, ystd = [], xlabel = r'$x \; (\mu m)$', ylabel = '$y \; (\mu m)$', size = (6*len(xpoint),5), is_multi = True, ylim = ylim, xlim = xlim, is_axis_equal = is_axis_equal, is_color = is_color, is_legend = is_legend )
+		return self._util.scheme_plot_fill( xdata = xpoint, ydata = ypoint, ystd = [], xlabel = r'$x \; (\mu m)$', ylabel = '$y \; (\mu m)$', size = ( (6,5*len(xpoint)) if is_vertical else (6*len(xpoint),5) ) , is_multi = True, is_vertical = is_vertical, ylim = ylim, xlim = xlim, is_axis_equal = is_axis_equal, is_color = is_color, is_legend = is_legend )
 	
-	def showAverageXTime ( self, is_multi = False, is_legend = False ):
+	def showAverageXTime ( self, is_multi = False, is_legend = False, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 		
 		time = []
 		average = []
@@ -132,9 +134,9 @@ class multi_graph :
 			std.append( xstd )
 
 		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
-		return self._util.scheme_plot_fill( xdata = time, ydata = average, ystd = std, xlabel = 't (min)', ylabel = '$x \; (\mu m)$', size = xsize, is_multi = is_multi, is_legend = is_legend )
+		return self._util.scheme_plot_fill( xdata = time, ydata = average, ystd = std, xlabel = 't (min)', ylabel = '$x \; (\mu m)$', size = xsize, is_multi = is_multi, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showAverageYTime ( self, is_multi = False, is_legend = False ):
+	def showAverageYTime ( self, is_multi = False, is_legend = False, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 		
 		time = []
 		average = []
@@ -146,11 +148,11 @@ class multi_graph :
 			std.append( xstd )
 
 		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
-		return self._util.scheme_plot_fill( xdata = time, ydata = average, ystd = std, xlabel = 't (min)', ylabel = '$y \; (\mu m)$', size = xsize, is_multi = is_multi, is_legend = is_legend )
+		return self._util.scheme_plot_fill( xdata = time, ydata = average, ystd = std, xlabel = 't (min)', ylabel = '$y \; (\mu m)$', size = xsize, is_multi = is_multi, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
 	# difference tracking
 
-	def showCellDifferenceXTimeTracking ( self, is_color = False, is_legend = False ):
+	def showCellDifferenceXTimeTracking ( self, is_vertical = False, is_color = False, is_legend = False, ylim = None, xlim = None, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xpoint = []
@@ -159,9 +161,9 @@ class multi_graph :
 			xtime.append( time )
 			xpoint.append( point )
 
-		return self._util.scheme_plot_fill( xdata = xtime, ydata = xpoint, ystd = [], xlabel = 't (min)', ylabel = '$\Delta x \; (\mu m)$', size = (6*len(xpoint),5), is_multi = True, is_color = is_color, is_legend = is_legend )
+		return self._util.scheme_plot_fill( xdata = xtime, ydata = xpoint, ystd = [], ylim = ylim, xlim = xlim, xlabel = 't (min)', ylabel = '$\Delta x \; (\mu m)$', size = ( (6,5*len(xpoint)) if is_vertical else (6*len(xpoint),5) ), is_multi = True, is_vertical = is_vertical, is_color = is_color, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showCellDifferenceYTimeTracking (self, is_color = False, is_legend = False ):
+	def showCellDifferenceYTimeTracking ( self, is_vertical = False, is_color = False, is_legend = False, ylim = None, xlim = None, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		ytime = []
 		ypoint = []
@@ -170,7 +172,7 @@ class multi_graph :
 			ytime.append( time )
 			ypoint.append( point )
 
-		return self._util.scheme_plot_fill( xdata = ytime, ydata = ypoint, ystd = [], xlabel = 't (min)', ylabel = '$\Delta y \; (\mu m)$', size = (6*len(ypoint),5), is_multi = True, is_color = is_color, is_legend = is_legend )
+		return self._util.scheme_plot_fill( xdata = ytime, ydata = ypoint, ystd = [], ylim = ylim, xlim = xlim, xlabel = 't (min)', ylabel = '$\Delta y \; (\mu m)$', size = ( (6,5*len(ypoint)) if is_vertical else (6*len(ypoint),5) ), is_multi = True, is_vertical = is_vertical, is_color = is_color, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
 	# statistical significance
 	def showStatisticalSignificanceBySteps ( self, is_norm = False, is_multi = False, is_legend = False ):
@@ -181,18 +183,42 @@ class multi_graph :
 			time, point = self.motilitys[i].getAllXPath()
 			norm = numpy.sum( ~numpy.isnan(point), axis = 1 )
 			if is_norm :
-				norm = norm/numpy.sum(~numpy.isnan(point))
+				#norm = norm/numpy.sum(~numpy.isnan(point))
+				norm = 100*norm/point.shape[1]
 
 			xsteps.append( numpy.arange( norm[ norm > 0 ].shape[0] ) )
 			xpoint.append( norm[ norm > 0 ] )
 
+		if is_norm:
+			ylabel = 'Percentage of Tracks (%)'
+		else:
+			ylabel = 'Number of Tracks'
 
 		xsize = (6*len(self.motilitys), 5) if is_multi else (6, 5)
-		return self._util.scheme_plot_fill( xdata = xsteps, ydata = xpoint, xlabel = 'Steps', ylabel = 'Number of Tracks', size = xsize, is_multi = is_multi, is_legend = is_legend )
+		return self._util.scheme_plot_fill( xdata = xsteps, ydata = xpoint, xlabel = 'Number of steps', ylabel = ylabel, size = xsize, is_multi = is_multi, is_legend = is_legend )
+
+	def showDistributionLengthTrajectories ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False, loc_legend = 'best' ):
+
+		xpoint = []
+		for i in range( len(self.motilitys) ):
+			time, point = self.motilitys[i].getAllXPath()
+			xlength = numpy.sum( ~numpy.isnan(point), axis = 0 )
+			
+			xpoint.append( xlength.flatten() )
+
+		if is_density :
+			ylabel = 'P (Trajectory length)'
+		else :
+			ylabel = 'N (Trajectory length)'
+
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = xpoint, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Trajectory length', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale, loc_legend = loc_legend )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = xpoint, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Trajectory length', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale, loc_legend = loc_legend )
 
 	# quartile X, Y displacement
 
-	def showQuantileLinesDifferenceXTimeTracking ( self, quantile = [0.2,0.3,0.4,0.5,0.6,0.7,0.8], is_legend = False ):
+	def showQuantileLinesDifferenceXTimeTracking ( self, ylim = None, xlim = None, quantile = [0.2,0.3,0.4,0.5,0.6,0.7,0.8], is_legend = False, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 		
 		xtime = []
 		xpoint = []
@@ -201,9 +227,9 @@ class multi_graph :
 			xtime.append( time )
 			xpoint.append( numpy.nanquantile(point, quantile, axis = 1).T )
 
-		return self._util.scheme_plot_fill( xdata = xtime, ydata = xpoint, ystd = [], xlabel = 't (min)', ylabel = 'Quantile', size = (6*len(xpoint),5), is_multi = True, is_color = True, is_legend = False )
+		return self._util.scheme_plot_fill( xdata = xtime, ydata = xpoint, ystd = [], ylim = ylim, xlim = xlim, xlabel = 't (min)', ylabel = 'Quantile', size = (6*len(xpoint),5), is_multi = True, is_color = True, is_legend = False, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showQuantileLinesDifferenceYTimeTracking ( self, quantile = [0.2,0.3,0.4,0.5,0.6,0.7,0.8], is_legend = False ):
+	def showQuantileLinesDifferenceYTimeTracking ( self, quantile = [0.2,0.3,0.4,0.5,0.6,0.7,0.8], is_legend = False, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		ytime = []
 		ypoint = []
@@ -212,29 +238,33 @@ class multi_graph :
 			ytime.append( time )
 			ypoint.append( numpy.nanquantile(point, quantile, axis = 1).T )
 
-		return self._util.scheme_plot_fill( xdata = ytime, ydata = ypoint, ystd = [], xlabel = 't (min)', ylabel = 'Quantile', size = (6*len(ypoint),5), is_multi = True, is_color = True, is_legend = False )
+		return self._util.scheme_plot_fill( xdata = ytime, ydata = ypoint, ystd = [], xlabel = 't (min)', ylabel = 'Quantile', size = (6*len(ypoint),5), is_multi = True, is_color = True, is_legend = False, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showHistDifferenceX ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', ylabel = 'Count', bins = 10, is_density = False, is_legend = False ):
+	def showHistDifferenceX ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 
 		vanHoveX = []
 		for i in range( len(self.motilitys) ):
 			vanHoveX.append( self.motilitys[i].getAllDeltaX( is_flat= True ) )
 		
-		if dtype == 'hist' :
-			return self._util.scheme_hist( data = vanHoveX, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta x \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
-		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = vanHoveX, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta x \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		ylabel = r'$P(\Delta x)$' if is_density else r'$N(\Delta x)$'
 
-	def showHistDifferenceY ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', ylabel = 'Count', bins = 10, is_density = False, is_legend = False ):
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = vanHoveX, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta x \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = vanHoveX, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta x \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistDifferenceY ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 
 		vanHoveY = []
 		for i in range( len(self.motilitys) ):
 			vanHoveY.append( self.motilitys[i].getAllDeltaY( is_flat= True ) )
 		
+		ylabel = r'$P(\Delta y)$' if is_density else r'$N(\Delta y)$'
+
 		if dtype == 'hist':
-			return self._util.scheme_hist( data = vanHoveY, ylim = None, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta y \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_hist( data = vanHoveY, ylim = ylim, xlim = xlim,  htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta y \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = vanHoveY, ylim = None, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta y \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = vanHoveY, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta y \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 
 	def showInterQuartileDifferenceX ( self, is_test = False, showfliers = True ):
 
@@ -252,27 +282,31 @@ class multi_graph :
 
 		return self._util.scheme_single_boxplot( data = difference_y, ylabel = r'$\Delta y \; (\mu m)$', is_test = is_test, showfliers = showfliers )	
 
-	def showHistAbsoluteDifferenceX ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', ylabel = 'Count', bins = 10, is_density = False, is_legend = False ):
+	def showHistAbsoluteDifferenceX ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 		
 		AbsX = []
 		for i in range( len(self.motilitys) ):
 			AbsX.append( numpy.absolute( self.motilitys[i].getAllDeltaX( is_flat= True ) ) )
 		
-		if dtype == 'hist' :
-			return self._util.scheme_hist( data = AbsX, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$|\Delta x| \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
-		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = AbsX, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$|\Delta x| \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		ylabel = r'$P(|\Delta x|)$' if is_density else r'$N(|\Delta x|)$'
 
-	def showHistAbsoluteDifferenceY ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', ylabel = 'Count', bins = 10, is_density = False, is_legend = False ):
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = AbsX, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$|\Delta x| \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = AbsX, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$|\Delta x| \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistAbsoluteDifferenceY ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 		
 		AbsY = []
 		for i in range( len(self.motilitys) ):
 			AbsY.append( numpy.absolute( self.motilitys[i].getAllDeltaY( is_flat= True ) ) )
 		
+		ylabel = r'$P(|\Delta y|)$' if is_density else r'$N(|\Delta y|)$'
+
 		if dtype == 'hist' :
-			return self._util.scheme_hist( data = AbsY, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$|\Delta y| \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_hist( data = AbsY, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$|\Delta y| \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = AbsY, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$|\Delta y| \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = AbsY, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$|\Delta y| \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 	
 	def showInterQuartileAbsoluteDifferenceX ( self, is_test = False, showfliers = True ):
 
@@ -290,27 +324,31 @@ class multi_graph :
 
 		return self._util.scheme_single_boxplot( data = abs_difference_y, ylabel = r'$|\Delta y| \; (\mu m)$', is_test = is_test, showfliers = showfliers )
 
-	def showHistSquaredDifferenceX ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', ylabel = 'Count', bins = 10, is_density = False, is_legend = False ):
+	def showHistSquaredDifferenceX ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 
 		SquaredX = []
 		for i in range( len(self.motilitys) ):
 			SquaredX.append( numpy.power( self.motilitys[i].getAllDeltaX( is_flat= True ),2 ) )
 		
-		if dtype == 'hist' :
-			return self._util.scheme_hist( data = SquaredX, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta x^2 \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
-		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = SquaredX, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta x^2 \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		ylabel = r'$P(\Delta x^2)$' if is_density else r'$N(\Delta x^2)$'
 
-	def showHistSquaredDifferenceY ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', ylabel = 'Count', bins = 10, is_density = False, is_legend = False ):
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = SquaredX, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta x^2 \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = SquaredX, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta x^2 \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistSquaredDifferenceY ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 
 		SquaredY = []
 		for i in range( len(self.motilitys) ):
 			SquaredY.append( numpy.power( self.motilitys[i].getAllDeltaY( is_flat= True ),2 ) )
 		
+		ylabel = r'$P(\Delta y^2)$' if is_density else r'$N(\Delta y^2)$'
+
 		if dtype == 'hist' :
-			return self._util.scheme_hist( data = SquaredY, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta y^2 \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_hist( data = SquaredY, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta y^2 \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = SquaredY, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta y^2 \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = SquaredY, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\Delta y^2 \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 
 	def showInterQuartileAbsoluteDifferenceXY ( self, is_test = False, is_ns_test = False, showfliers = True, color_box = ['dimgray','lightgray'] ):
 
@@ -356,7 +394,7 @@ class multi_graph :
 
 	# noah, joseph, mosses effect
 
-	def showMosesEffectXTimeTracking (self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showMosesEffectXTimeTracking (self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 		xtime = []
 		xpoint = []
 		for i in range( len(self.motilitys) ):
@@ -367,9 +405,9 @@ class multi_graph :
 			xpoint.append( xdata[:-1:] )
 
 		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$m[Y_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$m[Y_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		
-	def showNoahEffectXTimeTracking ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear'):
+	def showNoahEffectXTimeTracking ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xpoint = []
@@ -381,9 +419,9 @@ class multi_graph :
 			xpoint.append( xdata[:-1:] )
 
 		xsize = (6*len(xtime),len(xtime)) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$m[Z_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$m[Z_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		
-	def showJosephEffectXTimeTracking ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showJosephEffectXTimeTracking ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xpoint = []
@@ -407,9 +445,9 @@ class multi_graph :
 			xpoint.append( numpy.nanmean( R/S , axis = 1 ) )
 
 		xsize = (6*len(xtime),len(xtime)) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$E[R_t/S_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$E[R_t/S_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 	
-	def showMosesEffectYTimeTracking (self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showMosesEffectYTimeTracking (self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 		
 		xtime = []
 		xpoint = []
@@ -421,9 +459,9 @@ class multi_graph :
 			xpoint.append( xdata[:-1:] )
 
 		xsize = (6*len(xtime),len(xtime)) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$m[Y_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$m[Y_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 	
-	def showNoahEffectYTimeTracking ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear'):
+	def showNoahEffectYTimeTracking ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xpoint = []
@@ -435,9 +473,9 @@ class multi_graph :
 			xpoint.append( xdata[:-1:] )
 
 		xsize = (6*len(xtime),len(xtime)) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$m[Z_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$m[Z_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showJosephEffectYTimeTracking ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showJosephEffectYTimeTracking ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xpoint = []
@@ -461,7 +499,7 @@ class multi_graph :
 			xpoint.append( numpy.nanmean( R/S , axis = 1 ) )
 
 		xsize = (6*len(xtime),len(xtime)) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$E[R_t/S_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xpoint, xlabel = 't (min)', ylabel = r'$E[R_t/S_t]$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 	
 	# power spectral density (PSD) of displacement
 
@@ -509,7 +547,7 @@ class multi_graph :
 				plt.plot( avg_freq[window[0]:window[1]],  numpy.power(avg_freq[window[0]:window[1]], xf_psd.slope )*math.pow(10, xf_psd.intercept), linestyle = '-', color = 'black', lw = 4 )
 				plt.text( avg_freq[window[0]], math.pow(avg_freq[window[1]-1],xf_psd.slope)  , 'Slope ~ '+str( round(xf_psd.slope,1) ), color = 'black', fontweight = 'bold', fontsize = 12 )
 
-				const_fits.append( ( xf_psd.slope, math.pow(10, xf_psd.intercept) ) )
+				const_fits.append( { 'slope' : xf_psd.slope, 'std slope' : xf_psd.stderr, 'intercept' : math.pow(10, xf_psd.intercept), 'std intercept' : (math.pow(10, xf_psd.intercept + xf_psd.intercept_stderr) - math.pow(10, xf_psd.intercept - xf_psd.intercept_stderr))*0.5 } )
 
 			plt.xscale( xscale )
 			plt.yscale( yscale )
@@ -565,7 +603,7 @@ class multi_graph :
 
 				plt.plot( avg_freq[window[0]:window[1]],  numpy.power(avg_freq[window[0]:window[1]], xf_psd.slope )*math.pow(10, xf_psd.intercept), linestyle = '-', color = 'black', lw = 4 )
 				
-				const_fits.append( ( xf_psd.slope, math.pow(10, xf_psd.intercept) ) )
+				const_fits.append( { 'slope' : xf_psd.slope, 'std slope' : xf_psd.stderr, 'intercept' : math.pow(10, xf_psd.intercept), 'std intercept' : (math.pow(10, xf_psd.intercept + xf_psd.intercept_stderr) - math.pow(10, xf_psd.intercept - xf_psd.intercept_stderr))*0.5 } )
 
 			plt.xscale( xscale )
 			plt.yscale( yscale )
@@ -659,9 +697,63 @@ class multi_graph :
 			
 		return self._util.scheme_scatter( is_multi = True, vlines_x = vlines_x, size = (6*len(self.motilitys),5), xdata = aspect_ratio, ydata = steps, xlabel = r'$Aspect \; ratio ( t = t_{end} )$', ylabel = 'Number of Steps', is_legend = is_legend, xscale = xscale, yscale = yscale, is_fit = is_fit, type_fit = type_fit )
 		
+	# characteristics distributions
+
+	def showHistGlobalDivisionTime ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		divtime = []
+		for i in range( len(self.motilitys) ):
+			divtime.append( self.motilitys[i].getDivisionTime() )
+		
+		ylabel = 'P( Division time )' if is_density else 'N( Division time )'
+
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = divtime, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Division time (min)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = divtime, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Division time (min)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistGlobalCellSize ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		csize = []
+		for i in range( len(self.motilitys) ):
+			csize.append( self.motilitys[i].getCellSize() )
+		
+		ylabel = 'P( Cell size )' if is_density else 'N( Cell size )'
+
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = csize, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Cell size ($\mu m$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = csize, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Cell size ($\mu m$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistGlobalAspectRatio ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		aratio = []
+		for i in range( len(self.motilitys) ):
+			aratio.append( self.motilitys[i].getAspectRatio() )
+		
+		ylabel = 'P( Aspect ratio )' if is_density else 'N( Aspect ratio )'
+
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = aratio, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Aspect ratio', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = aratio, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Aspect ratio', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistGlobalGrowthRate ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		grate = []
+		for i in range( len(self.motilitys) ):
+			grate.append( self.motilitys[i].getAspectRatio() )
+		
+		ylabel = 'P( Growth rate )' if is_density else 'N( Growth rate )'
+
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = grate, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Growth rate ($\mu m.min^{-1}$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = grate, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'Growth rate ($\mu m.min^{-1}$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
 	# detail speed
 
-	def showScatterAllXYSpeed ( self, is_color = False, marker = 'o', markersize = 12, alpha = 0.2, is_legend = False ):
+	def showScatterAllXYSpeed ( self, ylim = None, xlim = None, is_color = False, marker = 'o', markersize = 12, alpha = 0.2, is_legend = False ):
 
 		xspeed = []
 		yspeed = []
@@ -671,31 +763,35 @@ class multi_graph :
 			xspeed.append(xsp)
 			yspeed.append(ysp)
 		
-		return self._util.scheme_scatter( xdata = xspeed, ydata = yspeed, xlabel = r'$\nu_{x} \; (\mu m.min^{-1})$', ylabel = r'$\nu_{y} \; (\mu m.min^{-1})$', size = (6*len(xspeed),len(xspeed)), is_multi = True, is_color = is_color, is_legend = is_legend, is_axis_equal = True, marker = marker, markersize = markersize, alpha = alpha )
+		return self._util.scheme_scatter( xdata = xspeed, ydata = yspeed, ylim = ylim, xlim = xlim, xlabel = r'$\nu_{x} \; (\mu m.min^{-1})$', ylabel = r'$\nu_{y} \; (\mu m.min^{-1})$', size = (6*len(xspeed),len(xspeed)), is_multi = True, is_color = is_color, is_legend = is_legend, is_axis_equal = True, marker = marker, markersize = markersize, alpha = alpha )
 
-	def showHistAllSpeed ( self, is_multi = False, ylim = None, htype = 'bar', dtype = 'hist', is_fit = False, type_fit = 'linear', marker = 'o', markersize = 12, xscale = 'linear', yscale = 'linear', ylabel = 'Count', bins = 10, is_density = False, is_legend = False ):
+	def showHistAllSpeed ( self, is_multi = False, is_vertical = False, ylim = None, xlim = None, htype = 'bar', dtype = 'hist', is_fit = False, type_fit = 'linear', marker = 'o', markersize = 12, xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 
 		speed = []
 		for i in range( len(self.motilitys) ):
 			speed.append( self.motilitys[i].getAllVelocity( is_flat= True ) )
 		
-		if dtype == 'hist':
-			return self._util.scheme_hist( data = speed, ylim = ylim, ylabel = ylabel, xlabel = r'$\nu \; (\mu m.min^{-1})$', htype = htype, density = is_density, is_fit = is_fit, type_fit = type_fit, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )	
-		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = speed, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\nu \; (\mu m.min^{-1})$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		ylabel = r'$P(\nu)$' if is_density else r'$N(\nu)$'
 
-	def showHistAllSquaredSpeed ( self, is_multi = False, ylim = None, htype = 'bar', dtype = 'hist', is_fit = False, type_fit = 'linear', marker = 'o', markersize = 12, xscale = 'linear', yscale = 'linear', ylabel = 'Count', bins = 10, is_density = False, is_legend = False ):
+		if dtype == 'hist':
+			return self._util.scheme_hist( data = speed, ylim = ylim, xlim = xlim, ylabel = ylabel, xlabel = r'$\nu \; (\mu m.min^{-1})$', htype = htype, density = is_density, is_fit = is_fit, type_fit = type_fit, is_legend = is_legend, is_multi = is_multi, is_vertical = is_vertical, bins = bins, xscale = xscale, yscale = yscale )	
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = speed, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\nu \; (\mu m.min^{-1})$', density = is_density, is_legend = is_legend, is_multi = is_multi, is_vertical = is_vertical, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistAllSquaredSpeed ( self, is_multi = False, ylim = None, xlim = None, htype = 'bar', dtype = 'hist', is_fit = False, type_fit = 'linear', marker = 'o', markersize = 12, xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 
 		squared_speed = []
 		for i in range( len(self.motilitys) ):
 			squared_speed.append( numpy.power( self.motilitys[i].getAllVelocity( is_flat= True ),2 ) )
 		
+		ylabel = r'$P(\nu ^2)$' if is_density else r'$N(\nu ^2)$'
+
 		if dtype == 'hist':
 			return self._util.scheme_hist( data = squared_speed, ylim = ylim, ylabel = ylabel, xlabel = r'$\nu^2 \; (\mu m.min^{-1})$', htype = htype, density = is_density, is_fit = True, type_fit = type_fit, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = squared_speed, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\nu^2 \; (\mu m.min^{-1})$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = squared_speed, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'$\nu^2 \; (\mu m.min^{-1})$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 
-	def showAverageNormVelocityAutocorrelation ( self, show_std = False, size = (12,5), xscale = 'linear', yscale = 'linear', is_legend = True ) :
+	def showAverageNormVelocityAutocorrelation ( self, show_std = False, size = (12,5), xscale = 'linear', yscale = 'linear', is_legend = True, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ) :
 		timeVelAuto = []
 		avgVelAuto = []
 		stdVelAuto = []
@@ -706,13 +802,10 @@ class multi_graph :
 			if show_std :
 				stdVelAuto.append( std )
 
-		return self._util.scheme_plot_fill( xdata = timeVelAuto, ydata = avgVelAuto, ystd = stdVelAuto, xlabel = 'Time (min)', ylabel = 'Velocity Autocorrelation', is_legend = is_legend, xscale = xscale, yscale = yscale, size = size )
+		return self._util.scheme_plot_fill( xdata = timeVelAuto, ydata = avgVelAuto, ystd = stdVelAuto, xlabel = 'Time (min)', ylabel = 'Velocity Autocorrelation', is_legend = is_legend, xscale = xscale, yscale = yscale, size = size, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
 	def showAllAndAveragePowerSpectrumVelocityAutocorrelation ( self, is_fit = False, window = (0,20), bins = 50, xscale = 'linear', yscale = 'linear' ):
 		
-		def fit_psd(f, slope, const):
-			return slope*f + const
-
 		const_fits = []
 
 		plt.figure( figsize = ( 8*len(self.motilitys), 5 ) )
@@ -752,12 +845,12 @@ class multi_graph :
 				xfit = xfit[i_noninf]
 				yfit = yfit[i_noninf]
 
-				xf_psd = curve_fit( fit_psd, xfit, yfit )
+				xf_psd = linregress( xfit, yfit )
 				
-				plt.plot( xbin[1::][window[0]:window[1]],  numpy.power(xbin[1::][window[0]:window[1]], xf_psd[0][0] )*math.pow(10, xf_psd[0][1]), linestyle = '-', color = 'black', lw = 4 )
+				plt.plot( xbin[1::][window[0]:window[1]],  numpy.power(xbin[1::][window[0]:window[1]], xf_psd.slope )*math.pow(10, xf_psd.intercept), linestyle = '-', color = 'black', lw = 4 )
 				plt.text( numpy.average(xbin[1::][window[1]]), numpy.average(ybin[window[1]]), ' slope '+str( round(xf_psd[0][0],2) ), color = 'black' )
 
-				const_fits.append( ( xf_psd[0][0], math.pow(10, xf_psd[0][1]) ) )
+				const_fits.append( { 'slope' : xf_psd.slope, 'std slope' : xf_psd.stderr , 'intercept' : math.pow(10, xf_psd.intercept), 'std intercept' : (math.pow(10, xf_psd.intercept + xf_psd.intercept_stderr) - math.pow(10, xf_psd.intercept - xf_psd.intercept_stderr))*0.5 } )
 
 			plt.xscale( xscale )
 			plt.yscale( yscale )
@@ -774,7 +867,7 @@ class multi_graph :
 	
 	# all MSD, TAMSD, MMA, TAMMA
 	# scale = {normal, length}
-	def showErgodicityBreakingParameterTAMSD ( self, scale = 'normal', is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear' ) :
+	def showErgodicityBreakingParameterTAMSD ( self, scale = 'normal', is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ) :
 
 		time = []
 		eb = []
@@ -791,18 +884,18 @@ class multi_graph :
 
 		xsize = (6*len(self.motilitys), 5) if is_multi else (6, 5)
 		xlabel = r'$\Delta$' if scale == 'normal' else r'$\Delta/T$'
-		xinfo_fit, xplt = self._util.scheme_scatter( xdata = time, ydata = eb, xlabel = xlabel, ylabel = 'EB', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale )
+		xinfo_fit, xplt = self._util.scheme_scatter( xdata = time, ydata = eb, xlabel = xlabel, ylabel = r'$EB \; (\Delta)$', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		if scale == 'normal':
 			if not is_multi:
-				i_nonnan = numpy.where( ~numpy.isnan( eb[0] ) )[0]
-				xplt.plot([0, time[0][i_nonnan[-1]]],[0,0], color= 'black', linestyle = ':')
+				lims = plt.axis()
+				xplt.plot([lims[0], lims[1]],[0,0], color= 'black', linestyle = ':')
 		else:
-			if not is_multi:
+			if not is_multi:				
 				xplt.plot(time[0],(4/3)*time[0], color= 'black', linestyle = ':')
 
 		return xinfo_fit, xplt
 
-	def showTAMSDMSDRatio ( self, is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear' ) :
+	def showTAMSDMSDRatio ( self, is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ) :
 
 		time = []
 		eb = []
@@ -813,14 +906,14 @@ class multi_graph :
 			eb.append( xeb )
 
 		xsize = (6*len(self.motilitys), 5) if is_multi else (6, 5)
-		xinfo_fit, xplt = self._util.scheme_scatter( xdata = time, ydata = eb, xlabel = r'$\Delta \; (min)$', ylabel = r'$\mathcal{EB}$', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale )
+		xinfo_fit, xplt = self._util.scheme_scatter( xdata = time, ydata = eb, xlabel = r'$\Delta \; (min)$', ylabel = r'$\mathcal{EB}$', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		if not is_multi:
 			i_nonnan = numpy.where( ~numpy.isnan(eb[0]) )[0]
 			xplt.plot( [0, time[0][i_nonnan[-1]] ], [1,1], color = 'black', linestyle = ':' )
 
 		return xinfo_fit, xplt
 
-	def showAverageTAMSD ( self, is_multi = False, window = None, is_fit = False, is_fit_all = False, type_fit = 'linear', xscale = 'linear', yscale = 'linear', is_legend = False, marker = 'o', markersize = 100, alpha = 0.5 ) :
+	def showAverageTAMSD ( self, is_multi = False, window = None, is_fit = False, is_fit_all = False, type_fit = 'linear', xscale = 'linear', yscale = 'linear', is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ) :
 		timemsd = []
 		avgmsd = []
 		stdmsd = []
@@ -831,9 +924,9 @@ class multi_graph :
 			avgmsd.append( average )
 
 		xsize = (6*len(self.motilitys), 5) if is_multi else (6, 5)
-		return self._util.scheme_scatter( xdata = timemsd, ydata = avgmsd, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, marker = marker, markersize = markersize, xlabel = 'Time (min)', ylabel = r'<TAMSD> $(\mu m^2)$', size = xsize, xscale = xscale, yscale = yscale, is_legend = is_legend, alpha = alpha )
+		return self._util.scheme_scatter( xdata = timemsd, ydata = avgmsd, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, marker = marker, markersize = markersize, xlabel = 'Time (min)', ylabel = r'<TAMSD> $(\mu m^2)$', size = xsize, xscale = xscale, yscale = yscale, is_legend = is_legend, alpha = alpha, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		
-	def showMSD ( self, is_multi = False, window = None, is_fit = False, is_fit_all = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, type_fit = 'linear', xscale = 'linear', yscale = 'linear' ) :
+	def showMSD ( self, ylabel = r'EAMSD $(\mu m^2)$', is_multi = False, window = None, is_fit = False, is_fit_all = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, type_fit = 'linear', xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ) :
 		timemsd = []
 		avgmsd = []
 		stdmsd = []
@@ -844,9 +937,9 @@ class multi_graph :
 			avgmsd.append( average )
 
 		xsize = (6*len(self.motilitys), 5) if is_multi else (6, 5)
-		return self._util.scheme_scatter( xdata = timemsd, ydata = avgmsd, xlabel = 'Time (min)', ylabel = r'EAMSD $(\mu m^2)$', size = xsize, xscale = xscale, yscale = yscale, is_legend = is_legend, marker = marker, markersize = markersize, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, alpha = alpha )
+		return self._util.scheme_scatter( xdata = timemsd, ydata = avgmsd, xlabel = 'Time (min)', ylabel = ylabel, size = xsize, xscale = xscale, yscale = yscale, is_legend = is_legend, marker = marker, markersize = markersize, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, alpha = alpha, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		
-	def showXMSD ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showXMSD ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xmsd = []
@@ -857,9 +950,9 @@ class multi_graph :
 			xmsd.append( mean )
 
 		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xmsd, xlabel = 't (min)', ylabel = r'$EAMSD_{x} \; ( \mu m^2 )$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xmsd, xlabel = 't (min)', ylabel = r'$EAMSD_{x} \; ( \mu m^2 )$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showYMSD ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showYMSD ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xmsd = []
@@ -870,9 +963,9 @@ class multi_graph :
 			xmsd.append( mean )
 
 		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xmsd, xlabel = 't (min)', ylabel = r'$EAMSD_{y} \; ( \mu m^2 )$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xmsd, xlabel = 't (min)', ylabel = r'$EAMSD_{y} \; ( \mu m^2 )$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showMME ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ) :
+	def showMME ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ) :
 		timemme = []
 		avgmme = []
 
@@ -882,9 +975,9 @@ class multi_graph :
 			avgmme.append( average )
 		
 		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = timemme, ydata = avgmme, xlabel = 'Time (min)', ylabel = 'MME', size = xsize, xscale = xscale, yscale = yscale, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window )
+		return self._util.scheme_scatter( xdata = timemme, ydata = avgmme, xlabel = 'Time (min)', ylabel = 'MME', size = xsize, xscale = xscale, yscale = yscale, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		
-	def showXMME ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showXMME ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xmme = []
@@ -895,9 +988,9 @@ class multi_graph :
 			xmme.append( mean )
 
 		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xmme, xlabel = 't (min)', ylabel = r'$MME_{x}( \mu m^2 )$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xmme, xlabel = 't (min)', ylabel = r'$MME_{x}( \mu m^2 )$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showYMME ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showYMME ( self, is_fit = False, type_fit = 'linear', window = (0,10), is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtime = []
 		xmme = []
@@ -908,7 +1001,7 @@ class multi_graph :
 			xmme.append( mean )
 
 		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = xtime, ydata = xmme, xlabel = 't (min)', ylabel = r'$MME_{y}( \mu m^2 )$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = xtime, ydata = xmme, xlabel = 't (min)', ylabel = r'$MME_{y}( \mu m^2 )$', is_fit = is_fit, type_fit = type_fit, window = window, size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
 	def showHistAmplitudeTAMSD ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', ylabel = 'Count', bins = 10, is_density = False, is_legend = False ):
 
@@ -921,7 +1014,7 @@ class multi_graph :
 		elif dtype == 'scatter':
 			return self._util.scheme_scatter_hist( data = amplitude, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, ylabel = ylabel, xlabel = r'$\xi$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 
-	def showAllTAMSD ( self, is_color = False, is_legend = False, is_multi = True, xscale = 'linear', yscale = 'linear' ) :
+	def showAllTAMSD ( self, is_color = False, is_legend = False, loc_legend = 'best', is_multi = True, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None ) :
 
 		timemsd = []
 		avgmsd = []
@@ -931,92 +1024,194 @@ class multi_graph :
 			avgmsd.append( average )
 
 		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
-		return self._util.scheme_plot_fill( xdata = timemsd, ydata = avgmsd, ystd = [], xlabel = 'Time (min)', ylabel = 'TAMSD', size = xsize, xscale = xscale, yscale = yscale, is_multi = is_multi, is_color = is_color, is_legend = is_legend )
+		return self._util.scheme_plot_fill( xdata = timemsd, ydata = avgmsd, ystd = [], xlabel = 'Time (min)', ylabel = 'TAMSD', size = xsize, xscale = xscale, yscale = yscale, is_multi = is_multi, is_color = is_color, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
-	def showAverageAndTimeAverageMSD ( self, is_fit = False, window = (0,20), xscale = 'linear', yscale = 'linear' ) :
-
-		def fit_tamsd(t, alpha, org):
-			return alpha*t + org
+	def showAverageAndTimeAverageMSD ( self, is_multi = False, alpha = 1, is_fit = False, window = (0,20), type_fit = 'powerlaw', xscale = 'linear', yscale = 'linear', is_legend = False, loc_legend = 'best', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None ) :
 
 		const_fits = []
-
-		plt.figure( figsize = ( 8*len(self.motilitys), 5 ) )
+		legends = []
+		txt_legends = []
+		if is_multi:
+			plt.figure( figsize = ( 8*len(self.motilitys), 5 ) )
+		else:
+			plt.figure( figsize = ( 8, 5 ) )
 
 		for i in range( len(self.motilitys) ):
 			time_tamsd, y_tamsd = self.motilitys[i].getAllTAMSD()
 			time_etamsd, avg_etamsd, std_etamsd = self.motilitys[i].getAverageTAMSD()
 			time_emsd, avg_emsd, std_emsd = self.motilitys[i].getMSD()	
 
-			plt.subplot(1, len(self.motilitys), i+1)
+			if is_multi:
+				plt.subplot(1, len(self.motilitys), i+1)
+				plt.title( self._names[i], fontdict = {'fontsize':self._font_size} )
+			if not is_multi and not is_fit :
+				legends.append( Line2D([0], [0], color=self._colors[i], lw=6, ls = '-' ) )
+				txt_legends.append( self._names[i] )
 
-			plt.plot( time_tamsd, y_tamsd )
-			plt.plot( time_etamsd, avg_etamsd, marker = 'o', markeredgecolor = self._colors[i], markersize = 12, linestyle = '', markerfacecolor = (1,1,1,0.1), lw = 2 )
-			plt.plot( time_emsd, avg_emsd, marker = 's', markeredgecolor = self._colors[i], markersize = 12, linestyle = '', markerfacecolor = (1,1,1,0.1), lw = 2 )
+			plt.plot( time_tamsd, y_tamsd, color = self._colors[i], alpha = alpha )
+			plt.plot( time_etamsd, avg_etamsd, marker = 'o', zorder = 10, markeredgecolor = 'black', markersize = 12, linestyle = '', markerfacecolor = self._colors[i], lw = 2, label = '<TAMSD>' )
+			plt.plot( time_emsd, avg_emsd, marker = 's', zorder = 10, markeredgecolor = 'black', markersize = 12, linestyle = '', markerfacecolor = self._colors[i], lw = 2, label = 'EAMSD' )
 			
 			if is_fit :
-				self.motilitys[i].setFitTAMSD( window = window )
-
-				xf_etamsd = curve_fit( fit_tamsd, numpy.log10(time_etamsd[window[0]:window[1]]), numpy.log10( avg_etamsd[ window[0]:window[1] ] ) )
-				xf_emsd = curve_fit( fit_tamsd, numpy.log10(time_emsd[window[0]:window[1]]), numpy.log10( avg_emsd[ window[0]:window[1] ] ) )
-
-				plt.plot( time_etamsd[window[0]:window[1]],  numpy.power(time_etamsd[window[0]:window[1]], xf_etamsd[0][0] )*math.pow(10, xf_etamsd[0][1]), linestyle = '-', color = self._colors[i], alpha = 0.5, lw = 2 )
-				plt.text( numpy.average(time_etamsd[0]), numpy.average(avg_etamsd[0]), ' slope '+str( round(xf_etamsd[0][0],2) ), color = self._colors[i] )
-
-				plt.plot( time_emsd[window[0]:window[1]],  numpy.power(time_emsd[window[0]:window[1]], xf_emsd[0][0] )*math.pow(10, xf_emsd[0][1]), linestyle = '-', color = self._colors[i], alpha = 0.5, lw = 2 )
-				plt.text( numpy.average(time_emsd[0]), numpy.average(avg_emsd[0]), ' slope '+str( round(xf_emsd[0][0],2) ), color = self._colors[i] )
+				fit_color = Color( self._colors[i] )
+				fit_color.saturation = 0.5
 				
-				const_fits.append( ( math.pow(10, xf_etamsd[0][1]), xf_etamsd[0][0], math.pow(10, xf_emsd[0][1]), xf_emsd[0][0] ) )
+				if type_fit == 'powerlaw':
+
+					xtime_etamsd, y_etamsd = self.__UtilClearXY( numpy.log10(time_etamsd[ window[0]:window[1] ]), numpy.log10(avg_etamsd[ window[0]:window[1] ]) )
+					xtime_emsd, y_emsd = self.__UtilClearXY( numpy.log10(time_emsd[ window[0]:window[1] ]), numpy.log10(avg_emsd[ window[0]:window[1] ]) )
+
+					fit_etamsd = linregress( xtime_etamsd, y_etamsd )
+					fit_emsd = linregress( xtime_emsd, y_emsd )
+
+					plt.plot( time_etamsd[ window[0]:window[1] ],  numpy.power(time_etamsd[ window[0]:window[1] ], fit_etamsd.slope )*math.pow(10, fit_etamsd.intercept), zorder = 11, linestyle = '-', color = fit_color.hex, lw = 2 )
+					plt.plot( time_emsd[ window[0]:window[1] ],  numpy.power(time_emsd[ window[0]:window[1] ], fit_emsd.slope )*math.pow(10, fit_emsd.intercept), zorder = 11, linestyle = ':', color = fit_color.hex, lw = 2 )
+
+					legends.append( Line2D([0], [0], zorder = 12, color=fit_color.hex, lw=2, ls = '-' ) )
+					txt_legends.append( r'$slope_{<TAMSD>}$ ~ '+str( round(fit_etamsd.slope,2) ) )
+
+					legends.append( Line2D([0], [0], zorder = 12, color=fit_color.hex, lw=2, ls = ':' ) )
+					txt_legends.append( r'$slope_{EAMSD}$ ~ '+str( round(fit_emsd.slope,2) ) )
+
+					const_fits.append( { 'tamsd intercept': math.pow(10, fit_etamsd.intercept), 'tamsd std intercept': (math.pow(10, fit_etamsd.intercept + fit_etamsd.intercept_stderr) - math.pow(10, fit_etamsd.intercept - fit_etamsd.intercept_stderr))*0.5, 'tamsd slope': fit_etamsd.slope, 'tamsd std slope': fit_etamsd.stderr, 'msd intercept': math.pow(10, fit_emsd.intercept), 'msd intercept': (math.pow(10, fit_emsd.intercept + fit_emsd.intercept_stderr) - math.pow(10, fit_emsd.intercept - fit_emsd.intercept_stderr))*0.5, 'msd slope': fit_emsd.slope, 'std msd slope': fit_emsd.stderr } )
+				
+				elif type_fit == 'powerlawlin':
+
+					def fit_powerlawlin(t, slope, intercept):
+						return intercept*numpy.power(t,slope)
+
+					xtime_etamsd, y_etamsd = self.__UtilClearXY( time_etamsd[ window[0]:window[1] ], avg_etamsd[ window[0]:window[1] ] )
+					xtime_emsd, y_emsd = self.__UtilClearXY( time_emsd[ window[0]:window[1] ], avg_emsd[ window[0]:window[1] ] )
+
+					fit_etamsd = curve_fit( fit_powerlawlin, xtime_etamsd, y_etamsd )
+					fit_emsd = curve_fit( fit_powerlawlin, xtime_emsd, y_emsd )
+
+					plt.plot( time_etamsd[ window[0]:window[1] ], fit_etamsd[0][1]*numpy.power(time_etamsd[ window[0]:window[1] ],fit_etamsd[0][0]), zorder = 11, linestyle = '-', color = fit_color.hex, lw = 2 )
+					plt.plot( time_emsd[ window[0]:window[1] ], fit_emsd[0][1]*numpy.power(time_emsd[ window[0]:window[1] ],fit_emsd[0][0]), zorder = 11, linestyle = ':', color = fit_color.hex, lw = 2 )
+
+					legends.append( Line2D([0], [0], zorder = 12, color=fit_color.hex, lw=2, ls = '-' ) )
+					txt_legends.append( r'$slope_{<TAMSD>}$ ~ '+str( round(fit_etamsd[0][0],2) ) )
+
+					legends.append( Line2D([0], [0], zorder = 12, color=fit_color.hex, lw=2, ls = ':' ) )
+					txt_legends.append( r'$slope_{EAMSD}$ ~ '+str( round(fit_emsd[0][0],2) ) )
+
+					const_fits.append( { 'tamsd intercept': fit_etamsd[0][1], 'std tamsd intercept': math.sqrt(fit_etamsd[1][1][1]), 'tamsd slope': fit_etamsd[0][0], 'std tamsd slope': math.sqrt(fit_etamsd[1][0][0]), 'msd intercept': fit_emsd[0][1], 'std msd intercept': math.sqrt(fit_emsd[1][1][1]), 'msd slope': fit_emsd[0][0], 'std msd slope': math.sqrt(fit_emsd[1][0][0]) } )
+
+			if is_multi :
+				plt.xscale( xscale )
+				plt.yscale( yscale )
+				plt.xticks( fontsize = self._font_size )
+				plt.yticks( fontsize = self._font_size )
+				plt.xlabel( 'time (min)', fontdict = { 'size' : self._font_size } )
+				plt.ylabel( r'TAMSD, <TAMSD>, EAMSD $(\mu m^2)$', fontdict = { 'size' : self._font_size } )
+				plt.grid( linestyle = ':' )
+				if is_legend:
+					if is_fit:
+						plt.legend( legends, txt_legends, frameon = False, loc = loc_legend )
+						legends = []
+						txt_legends = []						
+					else:
+						plt.legend( frameon = False, loc = loc_legend )
+
+				if is_hd_ns :
+					lims = plt.axis()
+					plt.ylim( [ lims[2], lims[3] ] )
+					plt.xlim( [ lims[0], lims[1] ] )
+					plt.gca().add_patch( pat.Rectangle( ( x_hd_ns,lims[2]), (lims[1] - lims[0]) , (lims[3] - lims[2]), alpha = alpha_hd_ns, zorder = 2002, color = color_hd_ns, hatch = hatch_hd_ns ) )
+
+		if not is_multi:
+			plt.xscale( xscale )
+			plt.yscale( yscale )
+			plt.xticks( fontsize = self._font_size )
+			plt.yticks( fontsize = self._font_size )
+			plt.xlabel( 'time (min)', fontdict = { 'size' : self._font_size } )
+			plt.ylabel( r'TAMSD, <TAMSD>, EAMSD $(\mu m^2)$', fontdict = { 'size' : self._font_size } )
+			plt.grid( linestyle = ':' )
+
+			if is_legend :
+				if is_fit :
+					plt.legend( legends, txt_legends, frameon = False, loc = loc_legend, fontsize = 8 )
+				else:
+					legends.append( Line2D([0], [0], marker = 'o', markersize = 12, markeredgecolor = 'black', markerfacecolor = (1,1,1,0), lw=2, ls = '' ) )
+					txt_legends.append( '<TAMSD>' )
+					legends.append( Line2D([0], [0], marker = 's', markersize = 12, markeredgecolor = 'black', markerfacecolor = (1,1,1,0), lw=2, ls = '' ) )
+					txt_legends.append( 'EAMSD' )
+					plt.legend( legends, txt_legends, frameon = False, loc = loc_legend )
+
+			if is_hd_ns :
+				lims = plt.axis()
+				plt.ylim( [ lims[2], lims[3] ] )
+				plt.xlim( [ lims[0], lims[1] ] )
+				plt.gca().add_patch( pat.Rectangle( ( x_hd_ns,lims[2]), (lims[1] - lims[0]) , (lims[3] - lims[2]), alpha = alpha_hd_ns, zorder = 2002, color = color_hd_ns, hatch = hatch_hd_ns ) )
+		else:
+			plt.tight_layout()
+
+		return const_fits, plt
+	
+	def showAverageTimeAverageMSD ( self, show_type = 'power', is_multi = False, xscale = 'linear', yscale = 'linear' ) :
+
+		if is_multi :
+			plt.figure( figsize = ( 8*len(self.motilitys), 5 ) )
+		else:
+			plt.figure( figsize = ( 8, 5 ) )
+
+		for i in range( len(self.motilitys) ):
+			xtime_tamsd, xy_tamsd = self.motilitys[i].getAllTAMSD()
+			xy_avgpowetamsd = numpy.nanmean( numpy.power( xy_tamsd, 2 ), axis = 1 )
+			xtime_etamsd, xavg_etamsd, xstd_etamsd = self.motilitys[i].getAverageTAMSD()
+
+			xpowacg_etamsd = numpy.power( xavg_etamsd, 2 )
+
+			if is_multi:
+				plt.subplot(1, len(self.motilitys), i+1)
+
+			if show_type == 'power' :
+				plt.plot( xtime_etamsd, xpowacg_etamsd, marker = 'o', markeredgecolor = 'black', markersize = 12, linestyle = '', markerfacecolor = self._colors[i], lw = 2, label = self._names[i] )
+				plt.plot( xtime_tamsd, xy_avgpowetamsd, marker = 's', markeredgecolor = 'black', markersize = 12, linestyle = '', markerfacecolor = self._colors[i], lw = 2, label = self._names[i] )
+			elif show_type == 'dif':
+				plt.plot( xtime_etamsd, xy_avgpowetamsd - xpowacg_etamsd, marker = 'o', markeredgecolor = 'black', markersize = 12, linestyle = '', markerfacecolor = self._colors[i], lw = 2, label = self._names[i] )
+				plt.plot( xtime_etamsd, xpowacg_etamsd, marker = 's', markeredgecolor = 'black', markersize = 12, linestyle = '', markerfacecolor = self._colors[i], lw = 2, label = self._names[i] )
+			elif show_type == 'ergo':
+				plt.plot( xtime_etamsd, (xy_avgpowetamsd - xpowacg_etamsd)/xpowacg_etamsd, marker = 'o', markeredgecolor = 'black', markersize = 12, linestyle = '', markerfacecolor = self._colors[i], lw = 2, label = self._names[i] )
+			elif show_type == 'ergo2':
+				plt.plot( xtime_etamsd, xy_avgpowetamsd/xpowacg_etamsd, marker = 'o', markeredgecolor = 'black', markersize = 12, linestyle = '', markerfacecolor = self._colors[i], lw = 2, label = self._names[i] )
+
+			if is_multi :
+				plt.xscale( xscale )
+				plt.yscale( yscale )
+				plt.xticks( fontsize = self._font_size )
+				plt.yticks( fontsize = self._font_size )
+				plt.xlabel( 'time (min)', fontdict = { 'size' : self._font_size } )
+				plt.ylabel( r'$\langle TAMSD^2 \rangle, \; \langle TAMSD \rangle^2 \;  (\mu m^2)$', fontdict = { 'size' : self._font_size } )
+				plt.grid( linestyle = ':' )
+
+		if not is_multi :
 
 			plt.xscale( xscale )
 			plt.yscale( yscale )
 			plt.xticks( fontsize = self._font_size )
 			plt.yticks( fontsize = self._font_size )
 			plt.xlabel( 'time (min)', fontdict = { 'size' : self._font_size } )
-			plt.ylabel( r'MSD, TAMSD, <TAMSD> $(\mu m^2)$', fontdict = { 'size' : self._font_size } )
+			plt.ylabel( r'$\langle TAMSD^2 \rangle, \; \langle TAMSD \rangle^2 \;  (\mu m^2)$', fontdict = { 'size' : self._font_size } )
 			plt.grid( linestyle = ':' )
 
 		plt.tight_layout()
-
-		return const_fits, plt
 	
-	def showFirstValueTAMSD ( self, is_fit = False, xscale = 'linear', yscale = 'linear' ):
+	def showFirstValueTAMSD ( self, ylim = None, xlim = None, is_binned = False, bins = 20, is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
 
-		def fit_linear(x, m, c):
-			return x*m + c
-
-		info_fit = []
-		plt.figure( figsize = ( 6*len(self.motilitys), 5 ) )
+		steps = []
+		first_tamsd = []
 		for i in range( len(self.motilitys) ):
 			
 			time_tamsd, y_tamsd = self.motilitys[i].getAllTAMSD()
-			aspect_ratio = self.motilitys[i].getGlobalEndAspectRatio()
-			steps = (self.motilitys[i].getGlobalLengthPoints() - 1)
+			steps.append( self.motilitys[i].getGlobalLengthPoints() - 1 )
+			first_tamsd.append( y_tamsd[1,:] )
+		
+		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
+		return self._util.scheme_scatter( xdata = steps, ydata = first_tamsd, ylim = ylim, xlim = xlim, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = 'Steps', ylabel = r'$TAMSD \; (t=\Delta_0) \; (\mu m^2)$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
 
-			plt.subplot(1, len(self.motilitys), i+1)
-			plt.scatter( steps,y_tamsd[1,:], marker = 'o', c = self._colors[i], s = aspect_ratio*10 )
-			if is_fit:
 
-				xrest = curve_fit( fit_linear, numpy.log10(steps), numpy.log10(y_tamsd[1,:]) )
-				plt.plot( steps, numpy.power(steps,xrest[0][0])*math.pow(10,xrest[0][1]), color = 'black', linestyle ='-', lw = 2 )
-				plt.text( numpy.average(steps[0]), numpy.average(y_tamsd[1,0]), ' slope \n '+str( round(xrest[0][0],2) ), color = 'black', fontsize = self._font_size )
-				info_fit.append( {'slope':xrest[0][0], 'constant':math.pow(10,xrest[0][1])} )
-				
-			plt.xscale( xscale )
-			plt.yscale( yscale )
-			plt.xticks( fontsize = self._font_size )
-			plt.yticks( fontsize = self._font_size )
-			plt.xlabel( 'steps', fontdict = { 'size' : self._font_size } )
-			plt.ylabel( r'$TAMSD \; (t=\Delta_0) \; (\mu m^2)$', fontdict = { 'size' : self._font_size } )
-			plt.grid( linestyle = ':' )
-
-		plt.tight_layout()
-
-		return info_fit, plt
-
-	def showTimeAverageMSD ( self, is_multi = False, is_fit = False, window = (0,20), alpha = 1, xscale = 'linear', yscale = 'linear' ):
-
-		def fit_tamsd(t, alpha, org):
-			return alpha*t + org
+	def showTimeAverageMSD ( self, is_multi = False, is_fit = False, window = (0,20), alpha = 1, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		const_fits = []
 
@@ -1053,12 +1248,12 @@ class multi_graph :
 			if is_fit and is_multi :
 				self.motilitys[i].setFitTAMSD( window = window )
 
-				xf_etamsd = curve_fit( fit_tamsd, numpy.log10(time_etamsd[i][window[0]:window[1]]), numpy.log10( avg_etamsd[i][ window[0]:window[1] ] ) )
+				xf_etamsd = linregress( numpy.log10(time_etamsd[i][window[0]:window[1]]), numpy.log10( avg_etamsd[i][ window[0]:window[1] ] ) )
 				
-				plt.plot( time_etamsd[i][window[0]:window[1]],  numpy.power(time_etamsd[i][window[0]:window[1]], xf_etamsd[0][0] )*math.pow(10, xf_etamsd[0][1]), linestyle = ':', color = self._colors[i], lw = 2 )
+				plt.plot( time_etamsd[i][window[0]:window[1]],  numpy.power(time_etamsd[i][window[0]:window[1]], xf_etamsd.slope )*math.pow(10, xf_etamsd.intercept), linestyle = ':', color = self._colors[i], lw = 2 )
 				plt.text( numpy.average(time_etamsd[i][0]), numpy.average(avg_etamsd[i][0]), ' slope '+str( round(xf_etamsd[0][0],2) ), color = 'black' )
 
-				const_fits.append( { 'intercept':math.pow(10, xf_etamsd[0][1]), 'slope': xf_etamsd[0][0] } )
+				const_fits.append( { 'intercept':math.pow(10, xf_etamsd.intercept), 'std intercept':(math.pow(10, xf_etamsd.intercept + xf_etamsd.intercept_stderr) - math.pow(10, xf_etamsd.intercept - xf_etamsd.intercept_stderr))*0.5, 'slope': xf_etamsd.slope, 'std slope': xf_etamsd.stderr } )
 			if is_multi :
 				plt.xscale( xscale )
 				plt.yscale( yscale )
@@ -1067,9 +1262,15 @@ class multi_graph :
 				plt.xlabel( 'time (min)', fontdict = { 'size' : self._font_size } )
 				plt.ylabel( r'TAMSD, <TAMSD> $(\mu m^2)$', fontdict = { 'size' : self._font_size } )
 				plt.grid( linestyle = ':' )
+				if is_hd_ns :
+					lims = plt.axis()
+					plt.ylim( [ lims[2], lims[3] ] )
+					plt.xlim( [ lims[0], lims[1] ] )
+					plt.gca().add_patch( pat.Rectangle( ( x_hd_ns,lims[2]), (lims[1] - lims[0]) , (lims[3] - lims[2]), alpha = alpha_hd_ns, zorder = 10, color = color_hd_ns, hatch = hatch_hd_ns ) )
 
 		if not is_multi :
-			xls = ['solid','dotted','dashed','dashdot','loosely dotted','densely dotted','long dash with offset']
+			#xls = ['solid','dotted','dashed','dashdot','loosely dotted','densely dotted','long dash with offset']
+			xls = ['solid','dotted','dashed','dashdot',(0,(1,10)),(0,(1,1)),(5,(10,3))]
 			xtext_legend = []
 			xlegend = []
 			for i in range( len(self.motilitys) ):
@@ -1080,13 +1281,13 @@ class multi_graph :
 				if is_fit :
 					self.motilitys[i].setFitTAMSD( window = window )
 
-					xf_etamsd = curve_fit( fit_tamsd, numpy.log10(time_etamsd[i][window[0]:window[1]]), numpy.log10( avg_etamsd[i][ window[0]:window[1] ] ) )
+					xf_etamsd = linregress( numpy.log10(time_etamsd[i][window[0]:window[1]]), numpy.log10( avg_etamsd[i][ window[0]:window[1] ] ) )
+
+					plt.plot( time_etamsd[i][window[0]:window[1]],  numpy.power(time_etamsd[i][window[0]:window[1]], xf_etamsd.slope )*math.pow(10, xf_etamsd.intercept), linestyle = xls[i], color = 'black', lw = 2 )
 					
-					plt.plot( time_etamsd[i][window[0]:window[1]],  numpy.power(time_etamsd[i][window[0]:window[1]], xf_etamsd[0][0] )*math.pow(10, xf_etamsd[0][1]), linestyle = xls[i], color = 'black', lw = 2 )
-					
-					xlabel = xlabel + ' (slope '+str( round(xf_etamsd[0][0],2) )+')'
+					xlabel = xlabel + ' (slope '+str( round(xf_etamsd.slope,2) )+')'
 					xm_legend = Line2D([0], [0], markerfacecolor = self._colors[i], marker = 'o', markersize = 12, markeredgecolor = 'black', linestyle = xls[i], color = 'black', lw = 2 )
-					const_fits.append( { 'intercept': math.pow(10, xf_etamsd[0][1]), 'slope': xf_etamsd[0][0] } )
+					const_fits.append( { 'intercept': math.pow(10, xf_etamsd.intercept), 'std intercept': (math.pow(10, xf_etamsd.intercept + xf_etamsd.intercept_stderr) - math.pow(10, xf_etamsd.intercept - xf_etamsd.intercept_stderr))*0.5, 'slope': xf_etamsd.slope, 'std slope': xf_etamsd.stderr } )
 				
 				xtext_legend.append( xlabel )
 				xlegend.append( xm_legend )
@@ -1098,14 +1299,20 @@ class multi_graph :
 			plt.yticks( fontsize = self._font_size )
 			plt.xlabel( 'time (min)', fontdict = { 'size' : self._font_size } )
 			plt.ylabel( r'TAMSD, <TAMSD> $(\mu m^2)$', fontdict = { 'size' : self._font_size } )
-			plt.legend( xlegend, xtext_legend, frameon = False )
+			plt.legend( xlegend, xtext_legend, frameon = False, loc = loc_legend )
 			plt.grid( linestyle = ':' )
+
+			if is_hd_ns :
+				lims = plt.axis()
+				plt.ylim( [ lims[2], lims[3] ] )
+				plt.xlim( [ lims[0], lims[1] ] )
+				plt.gca().add_patch( pat.Rectangle( ( x_hd_ns,lims[2]), (lims[1] - lims[0]) , (lims[3] - lims[2]), alpha = alpha_hd_ns, zorder = 10, color = color_hd_ns, hatch = hatch_hd_ns ) )
 				
 		plt.tight_layout()
 
 		return const_fits, plt
 
-	def showMSDAndAverageTAMSD( self, is_fit = False, is_legend = False, type_fit = 'linear', window = (0,20), xscale = 'linear', yscale = 'linear' ):
+	def showMSDAndAverageTAMSD( self, is_fit = False, is_legend = False, type_fit = 'linear', window = (0,20), xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtype_fit = [type_fit]*len(self.motilitys) if type(type_fit) is not list else type_fit
 		xwindow = [window]*len(self.motilitys) if type(window) is not list else window
@@ -1158,7 +1365,7 @@ class multi_graph :
 					else:
 						plt.text( time_emsd[1], avg_emsd[1], r'$slope_{EAMSD}$ ~ '+str( round(xf_emsd.slope,2) ), color = self._colors[i] )
 					
-					const_fits.append( { 'tamsd intercept': math.pow(10, xf_etamsd.intercept), 'tamsd slope': xf_etamsd.slope, 'msd intercept': math.pow(10, xf_emsd.intercept), 'msd slope': xf_emsd.slope } )
+					const_fits.append( { 'tamsd intercept': math.pow(10, xf_etamsd.intercept), 'tamsd std intercept': (math.pow(10, xf_etamsd.intercept + xf_etamsd.intercept_stderr) - math.pow(10, xf_etamsd.intercept - xf_etamsd.intercept_stderr))*0.5 , 'tamsd slope': xf_etamsd.slope, 'tamsd std slope': xf_etamsd.stderr, 'msd intercept': math.pow(10, xf_emsd.intercept), 'msd std intercept': (math.pow(10, xf_emsd.intercept + xf_emsd.intercept_stderr) - math.pow(10, xf_emsd.intercept - xf_emsd.intercept_stderr))*0.5, 'msd slope': xf_emsd.slope, 'msd std slope': xf_emsd.stderr } )
 
 				elif xtype_fit[i] == 'bilinear':
 
@@ -1197,8 +1404,8 @@ class multi_graph :
 					plt.plot( xsplit_emsd_2,  numpy.power(xsplit_emsd_2, res_emsd_2.slope )*math.pow(10, res_emsd_2.intercept), linestyle = ':', color = self._colors[i], lw = 2 )
 					plt.text( xsplit_emsd_2[1], ysplit_emsd_2[1], r'$slope_{EAMSD}$ ~ '+str( round(res_emsd_2.slope,2) ), color = self._colors[i] )
 
-					const_fits.append( { 'tamsd slope 1' : res_etamsd_1.slope, 'tamsd intercept 1' : res_etamsd_1.intercept, 'tamsd slope 2' : res_etamsd_2.slope, 'tamsd intercept 2' : res_etamsd_2.intercept } )
-					const_fits.append( { 'msd slope 1' : res_emsd_1.slope, 'msd intercept 1' : res_emsd_1.intercept, 'msd slope 2' : res_emsd_2.slope, 'msd intercept 2' : res_emsd_2.intercept } )
+					const_fits.append( { 'tamsd slope 1' : res_etamsd_1.slope, 'tamsd std slope 1' : res_etamsd_1.stderr, 'tamsd intercept 1' : math.pow(10,res_etamsd_1.intercept), 'tamsd std intercept 1' : (math.pow(10,res_etamsd_1.intercept + res_etamsd_1.intercept_stderr) - math.pow(10,res_etamsd_1.intercept - res_etamsd_1.intercept_stderr))*0.5 , 'tamsd slope 2' : res_etamsd_2.slope, 'tamsd std slope 2' : res_etamsd_2.stderr, 'tamsd intercept 2' : math.pow(10,res_etamsd_2.intercept), 'tamsd std intercept 2' : (math.pow(10,res_etamsd_2.intercept + res_etamsd_2.intercept_stderr) - math.pow(10,res_etamsd_2.intercept - res_etamsd_2.intercept_stderr))*0.5 } )
+					const_fits.append( { 'msd slope 1' : res_emsd_1.slope, 'msd std slope 1' : res_emsd_1.stderr, 'msd intercept 1' : math.pow(10,res_emsd_1.intercept), 'msd std intercept 1' : (math.pow(10,res_emsd_1.intercept + res_emsd_1.intercept_stderr) - math.pow(10,res_emsd_1.intercept - res_emsd_1.intercept_stderr))*0.5, 'msd slope 2' : res_emsd_2.slope, 'msd std slope 2' : res_emsd_2.stderr, 'msd intercept 2' : math.pow(10,res_emsd_2.intercept), 'msd std intercept 2' : (math.pow(10, res_emsd_2.intercept + res_emsd_2.intercept_stderr) - math.pow(10, res_emsd_2.intercept - res_emsd_2.intercept_stderr))*0.5 } )
 
 
 		plt.xscale( xscale )
@@ -1209,14 +1416,17 @@ class multi_graph :
 		plt.ylabel( r'EAMSD, <TAMSD> $(\mu m^2)$', fontdict = { 'size' : self._font_size } )
 		plt.grid( linestyle = ':' )
 		if is_legend :
-			plt.legend( legends, txt_legends, loc = 'upper left', frameon = False, fontsize = 9 )
+			plt.legend( legends, txt_legends, loc = loc_legend, frameon = False, fontsize = 9 )
+
+		if is_hd_ns :
+			lims = plt.axis()
+			plt.ylim( [ lims[2], lims[3] ] )
+			plt.xlim( [ lims[0], lims[1] ] )
+			plt.gca().add_patch( pat.Rectangle( ( x_hd_ns,lims[2]), (lims[1] - lims[0]) , (lims[3] - lims[2]), alpha = alpha_hd_ns, zorder = 10, color = color_hd_ns, hatch = hatch_hd_ns ) )
 
 		return const_fits, plt
 
 	def showAverageAndTimeAverageMME ( self, is_fit = False, window = (0,20), xscale = 'linear', yscale = 'linear' ):
-
-		def fit_tamme(t, alpha, org):
-			return alpha*t + org
 
 		const_fits = []
 
@@ -1235,16 +1445,16 @@ class multi_graph :
 			if is_fit :
 				self.motilitys[i].setFitTAMME( window = window )
 
-				xf_etamme = curve_fit( fit_tamme, numpy.log10(time_etamme[window[0]:window[1]]), numpy.log10( avg_etamme[ window[0]:window[1] ] ) )
-				xf_emme = curve_fit( fit_tamme, numpy.log10(time_emme[window[0]:window[1]]), numpy.log10( avg_emme[ window[0]:window[1] ] ) )
+				xf_etamme = linregress( numpy.log10(time_etamme[window[0]:window[1]]), numpy.log10( avg_etamme[ window[0]:window[1] ] ) )
+				xf_emme = linregress( numpy.log10(time_emme[window[0]:window[1]]), numpy.log10( avg_emme[ window[0]:window[1] ] ) )
 
-				plt.plot( time_etamme[window[0]:window[1]],  numpy.power(time_etamme[window[0]:window[1]], xf_etamme[0][0] )*math.pow(10, xf_etamme[0][1]), linestyle = '-', color = self._colors[i], alpha = 0.5, lw = 2 )
-				plt.text( numpy.average(time_etamme[0]), numpy.average(avg_etamme[0]), ' slope '+str( round(xf_etamme[0][0],2) ), color = self._colors[i] )
+				plt.plot( time_etamme[window[0]:window[1]],  numpy.power(time_etamme[window[0]:window[1]], xf_etamme.slope )*math.pow(10, xf_etamme.intercept), linestyle = '-', color = self._colors[i], alpha = 0.5, lw = 2 )
+				plt.text( numpy.average(time_etamme[0]), numpy.average(avg_etamme[0]), ' slope '+str( round(xf_etamme.slope,2) ), color = self._colors[i] )
 
-				plt.plot( time_emme[window[0]:window[1]],  numpy.power(time_emme[window[0]:window[1]], xf_emme[0][0] )*math.pow(10, xf_emme[0][1]), linestyle = '-', color = self._colors[i], alpha = 0.5, lw = 2 )
-				plt.text( numpy.average(time_emme[0]), numpy.average(avg_emme[0]), ' slope '+str( round(xf_emme[0][0],2) ), color = self._colors[i] )
+				plt.plot( time_emme[window[0]:window[1]],  numpy.power(time_emme[window[0]:window[1]], xf_emme.slope )*math.pow(10, xf_emme.intercept), linestyle = '-', color = self._colors[i], alpha = 0.5, lw = 2 )
+				plt.text( numpy.average(time_emme[0]), numpy.average(avg_emme[0]), ' slope '+str( round(xf_emme.slope,2) ), color = self._colors[i] )
 				
-				const_fits.append( ( math.pow(10, xf_etamme[0][1]), xf_etamme[0][0], math.pow(10, xf_emme[0][1]), xf_emme[0][0] ) )
+				const_fits.append( { 'etamme intercept': math.pow(10, xf_etamme.intercept), 'std etamme intercept': (math.pow(10, xf_etamme.intercept + xf_etamme.intercept_stderr) - math.pow(10, xf_etamme.intercept - xf_etamme.intercept_stderr))*0.5, 'etamme slope' : xf_etamme.slope, 'std etamme slope' : xf_etamme.stderr, 'mme intercept' : math.pow(10, xf_emme.intercept), 'std mme intercept' : (math.pow(10, xf_emme.intercept + xf_emme.intercept_stderr) - math.pow(10, xf_emme.intercept - xf_emme.intercept_stderr))*0.5, 'mme slope' : xf_emme.slope, 'std mme slope' : xf_emme.stderr } )
 
 			plt.xscale( xscale )
 			plt.yscale( yscale )
@@ -1258,10 +1468,7 @@ class multi_graph :
 
 		return const_fits, plt
 
-	def showTimeAverageMME ( self, is_multi = False, is_fit = False, window = (0,20), xscale = 'linear', yscale = 'linear' ):
-
-		def fit_tamme(t, alpha, org):
-			return alpha*t + org
+	def showTimeAverageMME ( self, is_multi = False, is_fit = False, window = (0,20), xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		time_tamme = []
 		y_tamme = []
@@ -1296,13 +1503,13 @@ class multi_graph :
 			if is_fit and is_multi :
 				self.motilitys[i].setFitTAMME( window = window )
 
-				xf_etamme = curve_fit( fit_tamme, numpy.log10(time_etamme[i][window[0]:window[1]]), numpy.log10( avg_etamme[i][ window[0]:window[1] ] ) )
-				xf_emme = curve_fit( fit_tamme, numpy.log10(time_emme[i][window[0]:window[1]]), numpy.log10( avg_emme[i][ window[0]:window[1] ] ) )
+				xf_etamme = linregress( numpy.log10(time_etamme[i][window[0]:window[1]]), numpy.log10( avg_etamme[i][ window[0]:window[1] ] ) )
+				#xf_emme = linregress( numpy.log10(time_emme[i][window[0]:window[1]]), numpy.log10( avg_emme[i][ window[0]:window[1] ] ) )
 
-				plt.plot( time_etamme[i][window[0]:window[1]],  numpy.power(time_etamme[i][window[0]:window[1]], xf_etamme[0][0] )*math.pow(10, xf_etamme[0][1]), linestyle = ':', color = self._colors[i], lw = 2 )
-				plt.text( numpy.average(time_etamme[i][0]), numpy.average(avg_etamme[i][0]), ' slope '+str( round(xf_etamme[0][0],2) ), color = self._colors[i] )
+				plt.plot( time_etamme[i][window[0]:window[1]],  numpy.power(time_etamme[i][window[0]:window[1]], xf_etamme.slope )*math.pow(10, xf_etamme.intercept), linestyle = ':', color = self._colors[i], lw = 2 )
+				plt.text( numpy.average(time_etamme[i][0]), numpy.average(avg_etamme[i][0]), ' slope '+str( round(xf_etamme.slope,2) ), color = self._colors[i] )
 
-				const_fits.append( ( math.pow(10, xf_etamme[0][1]), xf_etamme[0][0] ) )
+				const_fits.append( { 'intercept' : math.pow(10, xf_etamme.intercept), 'std intercept' : (math.pow(10, xf_etamme.intercept + xf_etamme.intercept_stderr) - math.pow(10, xf_etamme.intercept - xf_etamme.intercept_stderr))*0.5, 'slope' : xf_etamme.slope, 'std slope' : xf_etamme.stderr } )
 
 			if is_multi:
 				plt.xscale( xscale )
@@ -1312,6 +1519,12 @@ class multi_graph :
 				plt.xlabel( 'time (min)', fontdict = { 'size' : self._font_size } )
 				plt.ylabel( r'TAMME, <TAMME> $(\mu m^2)$', fontdict = { 'size' : self._font_size } )
 				plt.grid( linestyle = ':' )
+				if is_hd_ns :
+					lims = plt.axis()
+					plt.ylim( [ lims[2], lims[3] ] )
+					plt.xlim( [ lims[0], lims[1] ] )
+					plt.gca().add_patch( pat.Rectangle( ( x_hd_ns,lims[2]), (lims[1] - lims[0]) , (lims[3] - lims[2]), alpha = alpha_hd_ns, zorder = 10, color = color_hd_ns, hatch = hatch_hd_ns ) )
+
 
 		if not is_multi:
 			for i in range( len(self.motilitys) ):
@@ -1320,13 +1533,13 @@ class multi_graph :
 				if is_fit :
 					self.motilitys[i].setFitTAMME( window = window )
 
-					xf_etamme = curve_fit( fit_tamme, numpy.log10(time_etamme[i][window[0]:window[1]]), numpy.log10( avg_etamme[i][ window[0]:window[1] ] ) )
-					xf_emme = curve_fit( fit_tamme, numpy.log10(time_emme[i][window[0]:window[1]]), numpy.log10( avg_emme[i][ window[0]:window[1] ] ) )
+					xf_etamme = linregress( numpy.log10(time_etamme[i][window[0]:window[1]]), numpy.log10( avg_etamme[i][ window[0]:window[1] ] ) )
+					#xf_emme = linregress( numpy.log10(time_emme[i][window[0]:window[1]]), numpy.log10( avg_emme[i][ window[0]:window[1] ] ) )
 
-					plt.plot( time_etamme[i][window[0]:window[1]],  numpy.power(time_etamme[i][window[0]:window[1]], xf_etamme[0][0] )*math.pow(10, xf_etamme[0][1]), linestyle = ':', color = self._colors[i], lw = 2 )
-					plt.text( numpy.average(time_etamme[i][0]), numpy.average(avg_etamme[i][0]), ' slope '+str( round(xf_etamme[0][0],2) ), color = self._colors[i] )
+					plt.plot( time_etamme[i][window[0]:window[1]],  numpy.power(time_etamme[i][window[0]:window[1]], xf_etamme.slope )*math.pow(10, xf_etamme.intercept), linestyle = ':', color = self._colors[i], lw = 2 )
+					plt.text( numpy.average(time_etamme[i][0]), numpy.average(avg_etamme[i][0]), ' slope '+str( round(xf_etamme.slope,2) ), color = self._colors[i] )
 
-					const_fits.append( ( math.pow(10, xf_etamme[0][1]), xf_etamme[0][0] ) )
+					const_fits.append( { 'intercept' : math.pow(10, xf_etamme.intercept), 'std intercept' : (math.pow(10, xf_etamme.intercept + xf_etamme.intercept_stderr) - math.pow(10, xf_etamme.intercept - xf_etamme.intercept_stderr))*0.5, 'slope' : xf_etamme.slope, 'std slope' : xf_etamme.stderr } )
 
 			plt.xscale( xscale )
 			plt.yscale( yscale )
@@ -1335,13 +1548,18 @@ class multi_graph :
 			plt.xlabel( 'time (min)', fontdict = { 'size' : self._font_size } )
 			plt.ylabel( r'TAMME, <TAMME> $(\mu m^2)$', fontdict = { 'size' : self._font_size } )
 			plt.grid( linestyle = ':' )
-			plt.legend( frameon = False )
+			plt.legend( frameon = False, loc = loc_legend )
+			if is_hd_ns :
+				lims = plt.axis()
+				plt.ylim( [ lims[2], lims[3] ] )
+				plt.xlim( [ lims[0], lims[1] ] )
+				plt.gca().add_patch( pat.Rectangle( ( x_hd_ns,lims[2]), (lims[1] - lims[0]) , (lims[3] - lims[2]), alpha = alpha_hd_ns, zorder = 10, color = color_hd_ns, hatch = hatch_hd_ns ) )
 
 		plt.tight_layout()
 
 		return const_fits, plt
 
-	def showMMEAndAverageTAMME ( self, is_fit = False, is_legend = False, type_fit = 'linear', window = (0,20), xscale = 'linear', yscale = 'linear' ):
+	def showMMEAndAverageTAMME ( self, is_fit = False, is_legend = False, type_fit = 'linear', window = (0,20), xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		xtype_fit = [type_fit]*len(self.motilitys) if type(type_fit) is not list else type_fit
 		xwindow = [window]*len(self.motilitys) if type(window) is not list else window
@@ -1391,7 +1609,7 @@ class multi_graph :
 					else:
 						plt.text( x_fit_emme[1], y_fit_emme[1], r'$slope_{EAMME}$ ~ '+str( round(xf_emme.slope,2) ), color = self._colors[i] )
 					
-					const_fits.append( { 'tamme intercept': math.pow(10, xf_etamme.intercept), 'tamme slope': xf_etamme.slope, 'mme intercept': math.pow(10, xf_emme.intercept), 'mme slope': xf_emme.slope } )
+					const_fits.append( { 'tamme intercept': math.pow(10, xf_etamme.intercept), 'tamme std intercept': (math.pow(10, xf_etamme.intercept + xf_etamme.intercept_stderr) - math.pow(10, xf_etamme.intercept - xf_etamme.intercept_stderr))*0.5, 'tamme slope': xf_etamme.slope, 'tamme std slope': xf_etamme.stderr, 'mme intercept': math.pow(10, xf_emme.intercept), 'mme std intercept': (math.pow(10, xf_emme.intercept + xf_emme.intercept_stderr) - math.pow(10, xf_emme.intercept - xf_emme.intercept_stderr))*0.5, 'mme slope': xf_emme.slope, 'mme std slope': xf_emme.stderr } )
 
 				elif xtype_fit[i] == 'bilinear':
 
@@ -1430,8 +1648,8 @@ class multi_graph :
 					plt.plot( xsplit_emme_2,  numpy.power(xsplit_emme_2, res_emme_2.slope )*math.pow(10, res_emme_2.intercept), linestyle = ':', color = self._colors[i], lw = 2 )
 					plt.text( xsplit_emme_2[1], ysplit_emme_2[1], r'$slope_{EAMME}$ ~ '+str( round(res_emme_2.slope,2) ), color = self._colors[i] )
 
-					const_fits.append( { 'tamme slope 1' : res_etamme_1.slope, 'tamme intercept 1' : res_etamme_1.intercept, 'tamme slope 2' : res_etamme_2.slope, 'tamme intercept 2' : res_etamme_2.intercept } )
-					const_fits.append( { 'mme slope 1' : res_emme_1.slope, 'mme intercept 1' : res_emme_1.intercept, 'mme slope 2' : res_emme_2.slope, 'mme intercept 2' : res_emme_2.intercept } )
+					const_fits.append( { 'tamme slope 1' : res_etamme_1.slope, 'tamme std slope 1' : res_etamme_1.stderr, 'tamme intercept 1' : math.pow(10,res_etamme_1.intercept), 'tamme std intercept 1' : (math.pow(10,res_etamme_1.intercept + res_etamme_1.intercept_stderr) - math.pow(10,res_etamme_1.intercept - res_etamme_1.intercept_stderr))*0.5, 'tamme slope 2' : res_etamme_2.slope, 'tamme std slope 2' : res_etamme_2.stderr, 'tamme intercept 2' : math.pow(10,res_etamme_2.intercept), 'tamme std intercept 2' : (math.pow(10,res_etamme_2.intercept + res_etamme_2.intercept_stderr) - math.pow(10,res_etamme_2.intercept - res_etamme_2.intercept_stderr))*0.5 } )
+					const_fits.append( { 'mme slope 1' : res_emme_1.slope, 'mme std slope 1' : res_emme_1.stderr, 'mme intercept 1' : math.pow(10,res_emme_1.intercept), 'mme std intercept 1' : (math.pow(10,res_emme_1.intercept + res_emme_1.intercept_stderr) - math.pow(10,res_emme_1.intercept - res_emme_1.intercept_stderr))*0.5, 'mme slope 2' : res_emme_2.slope, 'mme std slope 2' : res_emme_2.stderr, 'mme intercept 2' : math.pow(10,res_emme_2.intercept), 'mme std intercept 2' : (math.pow(10,res_emme_2.intercept + res_emme_2.intercept_stderr) - math.pow(10,res_emme_2.intercept - res_emme_2.intercept_stderr))*0.5 } )
 
 
 
@@ -1443,13 +1661,19 @@ class multi_graph :
 		plt.ylabel( r'EAMME, <TAMME> $(\mu m^2)$', fontdict = { 'size' : self._font_size } )
 		plt.grid( linestyle = ':' )
 		if is_legend :
-			plt.legend( legends, txt_legends, loc = 'upper left', frameon = False, fontsize = 9 )
+			plt.legend( legends, txt_legends, loc = loc_legend, frameon = False, fontsize = 9 )
+
+		if is_hd_ns :
+			lims = plt.axis()
+			plt.ylim( [ lims[2], lims[3] ] )
+			plt.xlim( [ lims[0], lims[1] ] )
+			plt.gca().add_patch( pat.Rectangle( ( x_hd_ns,lims[2]), (lims[1] - lims[0]) , (lims[3] - lims[2]), alpha = alpha_hd_ns, zorder = 10, color = color_hd_ns, hatch = hatch_hd_ns ) )
 
 		return const_fits, plt
 
 	# all scaling exponent and diffusion coefficient
 
-	def showDiffusionCoefficientScalingExponentTAMSD ( self, is_set_fit_TAMSD = False, window_TAMSD = (1,6), ylim = None, is_multi = False, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
+	def showDiffusionCoefficientScalingExponentTAMSD ( self, is_set_fit_TAMSD = False, window_TAMSD = (1,6), ylim = None, xlim = None, is_multi = False, is_vertical = False, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
 
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -1461,8 +1685,8 @@ class multi_graph :
 			scaling_fit_values.append( self.motilitys[i].getScalingExponentFit() )
 			diffussion_fit_values.append( self.motilitys[i].getGeneralisedDiffusionCoefficientFit() )
 
-		xsize = ( 6*len(self.motilitys) ,5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = scaling_fit_values, ydata = diffussion_fit_values, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = r'$ \beta $' , ylabel = r'$ K_{\beta} \; (\mu m^2/min^{\beta}) $', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
+		xsize = ( (6,5*len(self.motilitys)) if is_vertical else (6*len(self.motilitys),5) ) if is_multi else (6,5)
+		return self._util.scheme_scatter( xdata = scaling_fit_values, ydata = diffussion_fit_values, ylim = ylim, xlim = xlim, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = r'$ \beta $' , ylabel = r'$ K_{\beta} \; (\mu m^2/min^{\beta}) $', is_multi = is_multi, is_vertical = is_vertical, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 
 	def showDiffusionCoefficientScalingExponentTAMME ( self, is_set_fit_TAMME = False, window_TAMME = (1,6), ylim = None, is_multi = False, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
 
@@ -1479,7 +1703,7 @@ class multi_graph :
 		xsize = ( 6*len(self.motilitys) ,5) if is_multi else (6,5)
 		return self._util.scheme_scatter( xdata = scaling_fit_values, ydata = diffussion_fit_values, is_fit = is_fit, is_fit_all = is_fit_all, ylim = ylim, type_fit = type_fit, window = window, xlabel = r'$ \beta_{TAMME} $' , ylabel = r'$ K_{\beta}^{TAMME} \; (\mu m^2/min^{\beta}) $', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 
-	def showHistScalingExponent ( self, ylim = None, is_set_fit_TAMSD = False, window = (1,6), dtype = 'hist', is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+	def showHistScalingExponent ( self, ylim = None, xlim = None, is_set_fit_TAMSD = False, window = (1,6), dtype = 'hist', is_multi = False, is_vertical = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 		
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -1491,10 +1715,29 @@ class multi_graph :
 		
 		y_label = r'$P( \beta )$' if is_density else r'$N( \beta )$'
 		if dtype == 'hist' :
-			return self._util.scheme_hist( data = scaling_fit_values, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$\beta$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_hist( data = scaling_fit_values, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$\beta$', density = is_density, is_legend = is_legend, is_multi = is_multi, is_vertical = is_vertical, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = scaling_fit_values, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, ylabel = y_label, xlabel = r'$\beta$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = scaling_fit_values, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, ylabel = y_label, xlabel = r'$\beta$', density = is_density, is_legend = is_legend, is_multi = is_multi, is_vertical = is_vertical, bins = bins, xscale = xscale, yscale = yscale )
 	
+	def showPerSubSupScalingExponent ( self, is_set_fit_TAMSD = False, window = (1,6), width = 0.2, xticks = ['Subdiffusion','Superdiffusion'], is_legend = False, loc_legend = 'best', legend_items = None, positions = None, colors = None ) :
+
+		per_sub = []
+		per_sup = []
+		for i in range( len(self.motilitys) ):
+			
+			if is_set_fit_TAMSD :
+				self.motilitys[i].setFitTAMSD( window = window )
+
+			xscaling_exponent = self.motilitys[i].getScalingExponentFit()
+
+			sub = numpy.where( xscaling_exponent < 1 )[0]
+			sup = numpy.where( xscaling_exponent > 1 )[0]
+
+			per_sub.append( sub.shape[0]*100/xscaling_exponent.shape[0] )
+			per_sup.append( sup.shape[0]*100/xscaling_exponent.shape[0] )
+		
+		return self._util.scheme_bar( data = [ per_sub, per_sup ], ylabel = 'Percentage (%)', width = width, xticks = xticks, is_legend = is_legend, loc_legend = loc_legend, legend_items = legend_items, positions = positions, colors = colors )
+
 	def showInterQuartileScalingExponent ( self, is_set_fit_TAMSD = False, window = (1,6), is_test = False, showfliers = True ):
 
 		if is_set_fit_TAMSD :
@@ -1507,7 +1750,7 @@ class multi_graph :
 
 		return self._util.scheme_single_boxplot( data = scaling_fit_values, ylabel = r'$\beta$', is_test = is_test, showfliers = showfliers )
 
-	def showHistGeneralizedDiffusionCoefficient ( self, is_norm = False, ylim = None, is_set_fit_TAMSD = False, window = (1,6), type_fit = 'powerlaw', dtype = 'hist', is_multi = False, marker = 'o', markersize = 10, is_fit = False, htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+	def showHistGeneralizedDiffusionCoefficient ( self, is_norm = False, ylim = None, xlim = None, is_set_fit_TAMSD = False, window = (1,6), type_fit = 'powerlaw', dtype = 'hist', is_multi = False, is_vertical = False, marker = 'o', markersize = 10, is_fit = False, htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 		
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -1521,9 +1764,9 @@ class multi_graph :
 		x_label = r'$\frac{ K_{\beta} }{ \langle K_{\beta} \rangle } \; (a.u.)$' if is_norm else r'$K_{\beta} \; (\mu m^2/min^{\beta})$'
 		y_label = ( r'$P( \frac{ K_{\beta} }{ \langle K_{\beta} \rangle } )$' if is_norm else r'$P( K_{\beta} )$' ) if is_density else ( r'$N( \frac{ K_{\beta} }{ \langle K_{\beta} \rangle } )$' if is_norm else r'$N( K_{\beta} )$' )
 		if dtype == 'hist' :
-			return self._util.scheme_hist( data = diffusion_fit_values, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = x_label, density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_hist( data = diffusion_fit_values, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = x_label, density = is_density, is_legend = is_legend, is_multi = is_multi, is_vertical = is_vertical, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = diffusion_fit_values, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, ylabel = y_label, xlabel = x_label, density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = diffusion_fit_values, ylim = ylim, xlim= xlim, marker = marker, markersize = markersize, is_fit = is_fit, ylabel = y_label, xlabel = x_label, density = is_density, is_legend = is_legend, is_multi = is_multi, is_vertical = is_vertical, bins = bins, xscale = xscale, yscale = yscale )
 
 	def showInterQuartileGeneralizedDiffusionCoefficient ( self, is_set_fit_TAMSD = False, window = (1,6), is_test = False, showfliers = True ):
 
@@ -1537,7 +1780,7 @@ class multi_graph :
 
 		return self._util.scheme_single_boxplot( data = diffusion_fit_values, ylabel = r'$K_{\beta} \; (\mu m^2/min^{\beta})$', is_test = is_test, showfliers = showfliers )
 
-	def showHistFirstGeneralizedDiffusionCoefficient ( self, ylim = None, is_set_fit_TAMSD = False, window = (1,6), dtype = 'hist', is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+	def showHistFirstGeneralizedDiffusionCoefficient ( self, ylim = None, xlim = None, is_set_fit_TAMSD = False, window = (1,6), dtype = 'hist', is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -1549,9 +1792,9 @@ class multi_graph :
 		
 		y_label = r'$P( K_1 )$' if is_density else r'$N( K_1 )$'
 		if dtype == 'hist' :
-			return self._util.scheme_hist( data = first_diffusion_fit_values, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$K_1$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_hist( data = first_diffusion_fit_values, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$K_1$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = first_diffusion_fit_values, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, ylabel = y_label, xlabel = r'$K_1$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = first_diffusion_fit_values, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, ylabel = y_label, xlabel = r'$K_1$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 
 	def showInterQuartileFirstGeneralizedDiffusionCoefficient ( self, is_set_fit_TAMSD = False, window = (1,6), is_test = False, showfliers = True ):
 
@@ -1641,7 +1884,7 @@ class multi_graph :
 
 	# all scaling exponent and diffusion coefficient with aging
 	# @ type_time = ageing, norm, init, middle
-	def showFirstDiffusionCoeffientTimeExperiment ( self, type_time = 'ageing', is_binned = False, bins = 20, is_set_fit_TAMSD = False, window_TAMSD = (0,6), is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showFirstDiffusionCoeffientTimeExperiment ( self, ylim = None, xlim = None, type_time = 'ageing', is_binned = False, bins = 20, is_set_fit_TAMSD = False, window_TAMSD = (0,6), is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
 				self.motilitys[i].setFitTAMSD( window = window_TAMSD )
@@ -1672,9 +1915,9 @@ class multi_graph :
 		elif type_time == 'middle':
 			x_label = r'$\frac{t_f-t_i}{2} \; (min)$'
 
-		return self._util.scheme_scatter( xdata = start_time, ydata = first_diffusion_fit_values, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = x_label, ylabel = r'$K_1 \; (\mu m^2/min^{\beta})$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = start_time, ydata = first_diffusion_fit_values, ylim = ylim, xlim = xlim, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = x_label, ylabel = r'$K_1 \; (\mu m^2/min^{\beta})$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
 
-	def showFirstScalingExponentTimeExperiment ( self, type_time = 'ageing', is_binned = False, bins = 20, is_set_fit_TAMSD = False, window_TAMSD = (0,6), is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showFirstScalingExponentTimeExperiment ( self, ylim = None, xlim = None, type_time = 'ageing', is_binned = False, bins = 20, is_set_fit_TAMSD = False, window_TAMSD = (0,6), is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
 				self.motilitys[i].setFitTAMSD( window = window_TAMSD )
@@ -1705,9 +1948,9 @@ class multi_graph :
 		elif type_time == 'middle':
 			x_label = r'$\frac{t_f-t_i}{2} \; (min)$'
 
-		return self._util.scheme_scatter( xdata = start_time, ydata = first_exponent_fit_values, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = x_label, ylabel = r'${\beta}_1$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = start_time, ydata = first_exponent_fit_values, ylim = ylim, xlim = xlim, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = x_label, ylabel = r'${\beta}_1$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
 
-	def showGeneralizedDiffusionCoefficientTimeExperiment ( self, type_time = 'ageing', is_binned = False, bins = 20, is_set_fit_TAMSD = False, window_TAMSD = (0,6), is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showGeneralizedDiffusionCoefficientTimeExperiment ( self, ylim = None, xlim = None, type_time = 'ageing', is_binned = False, bins = 20, is_set_fit_TAMSD = False, window_TAMSD = (0,6), is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
 
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -1739,9 +1982,9 @@ class multi_graph :
 		elif type_time == 'middle':
 			x_label = r'$\frac{t_f-t_i}{2} \; (min)$'
 
-		return self._util.scheme_scatter( xdata = start_time, ydata = diffusion_fit_values, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = x_label, ylabel = r'$K_{\beta} \; (\mu m^2/min^{\beta})$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = start_time, ydata = diffusion_fit_values, ylim = ylim, xlim = xlim, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = x_label, ylabel = r'$K_{\beta} \; (\mu m^2/min^{\beta})$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
 
-	def showScalingExponentTimeExperiment ( self, type_time = 'ageing', is_binned = False, bins = 20, is_set_fit_TAMSD = False, window_TAMSD = (0,6), is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+	def showScalingExponentTimeExperiment ( self, ylim = None, xlim = None, type_time = 'ageing', is_binned = False, bins = 20, is_set_fit_TAMSD = False, window_TAMSD = (0,6), is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
 
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -1772,7 +2015,7 @@ class multi_graph :
 			x_label = r'$t_i \; (min)$'
 		elif type_time == 'middle':
 			x_label = r'$\frac{t_f-t_i}{2} \; (min)$'
-		return self._util.scheme_scatter( xdata = start_time, ydata = exponent_fit_values, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = x_label, ylabel = r'$\beta$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+		return self._util.scheme_scatter( xdata = start_time, ydata = exponent_fit_values, ylim = ylim, xlim = xlim, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = x_label, ylabel = r'$\beta$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
 
 	def showMeanCurvilinearSpeedTimeExperiment ( self, type_time = 'ageing', is_binned = False, bins = 20, is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ) :
 
@@ -1896,9 +2139,6 @@ class multi_graph :
 
 	def showTimeAverageMSDWithAgeing ( self, is_multi = False, is_fit = False, window = (0,20), xscale = 'linear', yscale = 'linear' ):
 
-		def fit_tamsd(t, alpha, org):
-			return alpha*t + org
-
 		const_fits = []
 
 		if is_multi :
@@ -1934,12 +2174,12 @@ class multi_graph :
 			if is_fit and is_multi :
 				self.motilitys[i].setFitTAMSD( window = window )
 
-				xf_etamsd = curve_fit( fit_tamsd, numpy.log10(time_etamsd[i][window[0]:window[1]]), numpy.log10( avg_etamsd[i][ window[0]:window[1] ] ) )
+				xf_etamsd = linregress( numpy.log10(time_etamsd[i][window[0]:window[1]]), numpy.log10( avg_etamsd[i][ window[0]:window[1] ] ) )
 				
-				plt.plot( time_etamsd[i][window[0]:window[1]],  numpy.power(time_etamsd[i][window[0]:window[1]], xf_etamsd[0][0] )*math.pow(10, xf_etamsd[0][1]), linestyle = ':', color = 'black', lw = 2 )
-				plt.text( numpy.average(time_etamsd[i][0]), numpy.average(avg_etamsd[i][0]), ' slope '+str( round(xf_etamsd[0][0],2) ), color = self._colors[i] )
+				plt.plot( time_etamsd[i][window[0]:window[1]],  numpy.power(time_etamsd[i][window[0]:window[1]], xf_etamsd.slope )*math.pow(10, xf_etamsd.intercept), linestyle = ':', color = 'black', lw = 2 )
+				plt.text( numpy.average(time_etamsd[i][0]), numpy.average(avg_etamsd[i][0]), ' slope '+str( round(xf_etamsd.slope,2) ), color = self._colors[i] )
 
-				const_fits.append( ( math.pow(10, xf_etamsd[0][1]), xf_etamsd[0][0] ) )
+				const_fits.append( { 'intercept' : math.pow(10, xf_etamsd.intercept), 'std intercept' : (math.pow(10, xf_etamsd.intercept + xf_etamsd.intercept_stderr) - math.pow(10, xf_etamsd.intercept - xf_etamsd.intercept_stderr))*0.5, 'slope' : xf_etamsd.slope, 'std slope' : xf_etamsd.stderr } )
 			if is_multi :
 				plt.xscale( xscale )
 				plt.yscale( yscale )
@@ -1956,12 +2196,12 @@ class multi_graph :
 				if is_fit :
 					self.motilitys[i].setFitTAMSD( window = window )
 
-					xf_etamsd = curve_fit( fit_tamsd, numpy.log10(time_etamsd[i][window[0]:window[1]]), numpy.log10( avg_etamsd[i][ window[0]:window[1] ] ) )
+					xf_etamsd = linregress( numpy.log10(time_etamsd[i][window[0]:window[1]]), numpy.log10( avg_etamsd[i][ window[0]:window[1] ] ) )
 					
-					plt.plot( time_etamsd[i][window[0]:window[1]],  numpy.power(time_etamsd[i][window[0]:window[1]], xf_etamsd[0][0] )*math.pow(10, xf_etamsd[0][1]), linestyle = ':', color = 'black', lw = 2 )
-					plt.text( numpy.average(time_etamsd[i][0]), numpy.average(avg_etamsd[i][0]), ' slope '+str( round(xf_etamsd[0][0],2) ), color = self._colors[i] )
+					plt.plot( time_etamsd[i][window[0]:window[1]],  numpy.power(time_etamsd[i][window[0]:window[1]], xf_etamsd.slope )*math.pow(10, xf_etamsd.intercept), linestyle = ':', color = 'black', lw = 2 )
+					plt.text( numpy.average(time_etamsd[i][0]), numpy.average(avg_etamsd[i][0]), ' slope '+str( round(xf_etamsd.slope,2) ), color = self._colors[i] )
 
-					const_fits.append( ( math.pow(10, xf_etamsd[0][1]), xf_etamsd[0][0] ) )
+					const_fits.append( { 'intercept' : math.pow(10, xf_etamsd.intercept), 'std intercept' : (math.pow(10, xf_etamsd.intercept + xf_etamsd.intercept_stderr) - math.pow(10, xf_etamsd.intercept - xf_etamsd.intercept_stderr))*0.5, 'slope' : xf_etamsd.slope, 'std slope' : xf_etamsd.stderr } )
 
 			plt.xscale( xscale )
 			plt.yscale( yscale )
@@ -2007,9 +2247,6 @@ class multi_graph :
 
 	def showMSDAndAverageTAMSDWithAgeing( self, is_fit = False, window = (0,20), xscale = 'linear', yscale = 'linear' ):
 
-		def fit_tamsd(t, alpha, org):
-			return alpha*t + org
-
 		const_fits = []
 
 		plt.figure( figsize = ( 8, 5 ) )
@@ -2035,16 +2272,16 @@ class multi_graph :
 				x_fit_emsd = x_fit_emsd[i_nonnan]
 				y_fit_emsd = y_fit_emsd[i_nonnan]
 
-				xf_etamsd = curve_fit( fit_tamsd, numpy.log10(x_fit_etamsd), numpy.log10(y_fit_etamsd) )
-				xf_emsd = curve_fit( fit_tamsd, numpy.log10(x_fit_emsd), numpy.log10(y_fit_emsd) )
+				xf_etamsd = linregress( numpy.log10(x_fit_etamsd), numpy.log10(y_fit_etamsd) )
+				xf_emsd = linregress( numpy.log10(x_fit_emsd), numpy.log10(y_fit_emsd) )
 
-				plt.plot( x_fit_etamsd,  numpy.power(x_fit_etamsd, xf_etamsd[0][0] )*math.pow(10, xf_etamsd[0][1]), linestyle = '-', color = self._colors[i], lw = 2 )
-				plt.text( time_etamsd[0], avg_etamsd[0], r'$slope_{<TAMSD>}$ ~ '+str( round(xf_etamsd[0][0],2) ), color = self._colors[i] )
+				plt.plot( x_fit_etamsd,  numpy.power(x_fit_etamsd, xf_etamsd.slope )*math.pow(10, xf_etamsd.intercept), linestyle = '-', color = self._colors[i], lw = 2 )
+				plt.text( time_etamsd[0], avg_etamsd[0], r'$slope_{<TAMSD>}$ ~ '+str( round(xf_etamsd.slope,2) ), color = self._colors[i] )
 
-				plt.plot( x_fit_emsd,  numpy.power(x_fit_emsd, xf_emsd[0][0] )*math.pow(10, xf_emsd[0][1]), linestyle = ':', color = self._colors[i], lw = 2 )
-				plt.text( time_emsd[1], avg_emsd[1], r'$slope_{MSD}$ ~ '+str( round(xf_emsd[0][0],2) ), color = self._colors[i] )
+				plt.plot( x_fit_emsd,  numpy.power(x_fit_emsd, xf_emsd.slope )*math.pow(10, xf_emsd.intercept), linestyle = ':', color = self._colors[i], lw = 2 )
+				plt.text( time_emsd[1], avg_emsd[1], r'$slope_{MSD}$ ~ '+str( round(xf_emsd.slope,2) ), color = self._colors[i] )
 				
-				const_fits.append( ( math.pow(10, xf_etamsd[0][1]), xf_etamsd[0][0], math.pow(10, xf_emsd[0][1]), xf_emsd[0][0] ) )
+				const_fits.append( { 'etamsd intercept' : math.pow(10, xf_etamsd.intercept), 'std etamsd intercept' : (math.pow(10, xf_etamsd.intercept + xf_etamsd.intercept_stderr) - math.pow(10, xf_etamsd.intercept - xf_etamsd.intercept_stderr))*0.5, 'etamsd slope' : xf_etamsd.slope, 'std etamsd slope' : xf_etamsd.stderr, 'msd intercept' : math.pow(10, xf_emsd.intercept), 'std msd intercept' : (math.pow(10, xf_emsd.intercept + xf_emsd.intercept_stderr) - math.pow(10, xf_emsd.intercept - xf_emsd.intercept_stderr))*0.5, 'msd slope' : xf_emsd.slope, 'std msd slope' : xf_emsd.stderr } )
 
 		plt.xscale( xscale )
 		plt.yscale( yscale )
@@ -2076,25 +2313,25 @@ class multi_graph :
 
 	# dynamical functional
 
-	def showXAllMixingErgoDynamicalFunctionalTest ( self, ylabel_mix_r = r'$Re\left( \hat E(n) \right)$', ylabel_mix_i = r'$Img\left( \hatE(n) \right)$', ylabel_erg_r = r'$Re\left( \sum_{k=0}^{n-1} \hat E(k)/n \right)$', ylabel_erg_i = r'$Img\left( \sum_{k=0}^{n-1} \hat E(k)/n \right)$' ):
+	def showXAllMixingErgoDynamicalFunctionalTest ( self, ylabel_mix_r = r'$Re\left( \hat E(n) \right)$', ylabel_mix_i = r'$Img\left( \hatE(n) \right)$', ylabel_erg_r = r'$Re\left( \sum_{k=0}^{n-1} \hat E(k)/n \right)$', ylabel_erg_i = r'$Img\left( \sum_{k=0}^{n-1} \hat E(k)/n \right)$', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		plt.figure( figsize = ( 24, 4*len(self.motilitys) ) )
 
 		for i in range( len(self.motilitys) ):
 			xtim, xmix, xergo = self.motilitys[i].getXAllMixingBreakingDynamicalFunctionalTest()
 			plt.subplot(len(self.motilitys),4,4*i+1)
-			self._util.scheme_plot_fill( xdata = [xtim], ydata = [numpy.real(xmix)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_mix_r, is_color = True )
+			self._util.scheme_plot_fill( xdata = [xtim], ydata = [numpy.real(xmix)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_mix_r, is_color = True, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 			plt.subplot(len(self.motilitys),4,4*i+2)
-			self._util.scheme_plot_fill( xdata = [xtim], ydata = [numpy.imag(xmix)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_mix_i, is_color = True )
+			self._util.scheme_plot_fill( xdata = [xtim], ydata = [numpy.imag(xmix)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_mix_i, is_color = True, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 			plt.subplot(len(self.motilitys),4,4*i+3)
-			self._util.scheme_plot_fill( xdata = [xtim], ydata = [numpy.real(xergo)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_erg_r, is_color = True )
+			self._util.scheme_plot_fill( xdata = [xtim], ydata = [numpy.real(xergo)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_erg_r, is_color = True, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 			plt.subplot(len(self.motilitys),4,4*i+4)
-			self._util.scheme_plot_fill( xdata = [xtim], ydata = [numpy.imag(xergo)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_erg_i, is_color = True )
+			self._util.scheme_plot_fill( xdata = [xtim], ydata = [numpy.imag(xergo)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_erg_i, is_color = True, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
 		plt.tight_layout()
 		return plt
 
-	def showXAverageMixingErgodicityDynamicalFunctionalTest ( self, ylabel_mix_r = 'Re(E(n))', ylabel_mix_i = 'Img(E(n))', ylabel_erg_r = r'$Re\left( \sum_{k=0}^{n-1} E(k)/n \right)$', ylabel_erg_i = r'$Img\left( \sum_{k=0}^{n-1} E(k)/n \right)$', is_legend = False ):
+	def showXAverageMixingErgodicityDynamicalFunctionalTest ( self, ylabel_mix_r = 'Re(E(n))', ylabel_mix_i = 'Img(E(n))', ylabel_erg_r = r'$Re\left( \sum_{k=0}^{n-1} E(k)/n \right)$', ylabel_erg_i = r'$Img\left( \sum_{k=0}^{n-1} E(k)/n \right)$', is_legend = False, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		time = []
 		mixing_real = []
@@ -2114,13 +2351,13 @@ class multi_graph :
 
 		plt.figure( figsize = ( 12, 8 ) )
 		plt.subplot(221)
-		self._util.scheme_plot_fill( xdata = time, ydata = mixing_real, is_fig = False, xlabel = 't (min)', ylabel = ylabel_mix_r, is_legend = is_legend )
+		self._util.scheme_plot_fill( xdata = time, ydata = mixing_real, is_fig = False, xlabel = 't (min)', ylabel = ylabel_mix_r, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		plt.subplot(222)
-		self._util.scheme_plot_fill( xdata = time, ydata = mixing_imag, is_fig = False, xlabel = 't (min)', ylabel = ylabel_mix_i, is_legend = is_legend )
+		self._util.scheme_plot_fill( xdata = time, ydata = mixing_imag, is_fig = False, xlabel = 't (min)', ylabel = ylabel_mix_i, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		plt.subplot(223)
-		self._util.scheme_plot_fill( xdata = time, ydata = ergodicity_real, is_fig = False, xlabel = 't (min)', ylabel = ylabel_erg_r, is_legend = is_legend )
+		self._util.scheme_plot_fill( xdata = time, ydata = ergodicity_real, is_fig = False, xlabel = 't (min)', ylabel = ylabel_erg_r, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		plt.subplot(224)
-		self._util.scheme_plot_fill( xdata = time, ydata = ergodicity_imag, is_fig = False, xlabel = 't (min)', ylabel = ylabel_erg_i, is_legend = is_legend )
+		self._util.scheme_plot_fill( xdata = time, ydata = ergodicity_imag, is_fig = False, xlabel = 't (min)', ylabel = ylabel_erg_i, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
 		plt.tight_layout()
 
@@ -2147,25 +2384,25 @@ class multi_graph :
 
 		return xinfo_mix, xpltmix, xinfo_ergo, xpltergo
 
-	def showYAllMixingErgoDynamicalFunctionalTest ( self, ylabel_mix_r = r'$Re\left( \hat E(n) \right)$', ylabel_mix_i = r'$Img\left( \hatE(n) \right)$', ylabel_erg_r = r'$Re\left( \sum_{k=0}^{n-1} \hat E(k)/n \right)$', ylabel_erg_i = r'$Img\left( \sum_{k=0}^{n-1} \hat E(k)/n \right)$' ):
+	def showYAllMixingErgoDynamicalFunctionalTest ( self, ylabel_mix_r = r'$Re\left( \hat E(n) \right)$', ylabel_mix_i = r'$Img\left( \hatE(n) \right)$', ylabel_erg_r = r'$Re\left( \sum_{k=0}^{n-1} \hat E(k)/n \right)$', ylabel_erg_i = r'$Img\left( \sum_{k=0}^{n-1} \hat E(k)/n \right)$', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		plt.figure( figsize = ( 24, 4*len(self.motilitys) ) )
 
 		for i in range( len(self.motilitys) ):
 			ytim, ymix, yergo = self.motilitys[i].getYAllMixingBreakingDynamicalFunctionalTest()
 			plt.subplot(len(self.motilitys),4,4*i+1)
-			self._util.scheme_plot_fill( xdata = [ytim], ydata = [numpy.real(ymix)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_mix_r, is_color = True )
+			self._util.scheme_plot_fill( xdata = [ytim], ydata = [numpy.real(ymix)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_mix_r, is_color = True, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 			plt.subplot(len(self.motilitys),4,4*i+2)
-			self._util.scheme_plot_fill( xdata = [ytim], ydata = [numpy.imag(ymix)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_mix_i, is_color = True )
+			self._util.scheme_plot_fill( xdata = [ytim], ydata = [numpy.imag(ymix)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_mix_i, is_color = True, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 			plt.subplot(len(self.motilitys),4,4*i+3)
-			self._util.scheme_plot_fill( xdata = [ytim], ydata = [numpy.real(yergo)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_erg_r, is_color = True )
+			self._util.scheme_plot_fill( xdata = [ytim], ydata = [numpy.real(yergo)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_erg_r, is_color = True, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 			plt.subplot(len(self.motilitys),4,4*i+4)
-			self._util.scheme_plot_fill( xdata = [ytim], ydata = [numpy.imag(yergo)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_erg_i, is_color = True )
+			self._util.scheme_plot_fill( xdata = [ytim], ydata = [numpy.imag(yergo)], ystd = [], is_fig = False, xlabel = 'Time (min)', ylabel = ylabel_erg_i, is_color = True, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
 		plt.tight_layout()
 		return plt
 	
-	def showYAverageMixingErgodicityDynamicalFunctionalTest ( self, ylabel_mix_r = 'Re(E(n))', ylabel_mix_i = 'Img(E(n))', ylabel_erg_r = r'$Re\left( \sum_{k=0}^{n-1} E(k)/n \right)$', ylabel_erg_i = r'$Img\left( \sum_{k=0}^{n-1} E(k)/n \right)$', is_legend = False ):
+	def showYAverageMixingErgodicityDynamicalFunctionalTest ( self, ylabel_mix_r = 'Re(E(n))', ylabel_mix_i = 'Img(E(n))', ylabel_erg_r = r'$Re\left( \sum_{k=0}^{n-1} E(k)/n \right)$', ylabel_erg_i = r'$Img\left( \sum_{k=0}^{n-1} E(k)/n \right)$', is_legend = False, is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		time = []
 		mixing_real = []
@@ -2184,13 +2421,13 @@ class multi_graph :
 
 		plt.figure( figsize = ( 12, 8 ) )
 		plt.subplot(221)
-		self._util.scheme_plot_fill( xdata = time, ydata = mixing_real, is_fig = False, xlabel = 't (min)', ylabel = ylabel_mix_r, is_legend = is_legend )
+		self._util.scheme_plot_fill( xdata = time, ydata = mixing_real, is_fig = False, xlabel = 't (min)', ylabel = ylabel_mix_r, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		plt.subplot(222)
-		self._util.scheme_plot_fill( xdata = time, ydata = mixing_imag, is_fig = False, xlabel = 't (min)', ylabel = ylabel_mix_i, is_legend = is_legend )
+		self._util.scheme_plot_fill( xdata = time, ydata = mixing_imag, is_fig = False, xlabel = 't (min)', ylabel = ylabel_mix_i, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		plt.subplot(223)
-		self._util.scheme_plot_fill( xdata = time, ydata = ergodicity_real, is_fig = False, xlabel = 't (min)', ylabel = ylabel_erg_r, is_legend = is_legend )
+		self._util.scheme_plot_fill( xdata = time, ydata = ergodicity_real, is_fig = False, xlabel = 't (min)', ylabel = ylabel_erg_r, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		plt.subplot(224)
-		self._util.scheme_plot_fill( xdata = time, ydata = ergodicity_imag, is_fig = False, xlabel = 't (min)', ylabel = ylabel_erg_i, is_legend = is_legend )
+		self._util.scheme_plot_fill( xdata = time, ydata = ergodicity_imag, is_fig = False, xlabel = 't (min)', ylabel = ylabel_erg_i, is_legend = is_legend, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 
 		plt.tight_layout()
 
@@ -2219,7 +2456,7 @@ class multi_graph :
 
 	# all persistence
 
-	def showDiffusionCoefficientConfinementRatio ( self, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False,is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
+	def showDiffusionCoefficientConfinementRatio ( self, ylim = None, xlim = None, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False,is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
 		
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -2232,9 +2469,9 @@ class multi_graph :
 			diffussion_fit_values.append( self.motilitys[i].getGeneralisedDiffusionCoefficientFit() )
 
 		xsize = ( 6*len(ratio_confinement) ,5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = diffussion_fit_values, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Confinement ratio' , ylabel = r'$ K_{\beta} \; (\mu m^2/min^{\beta}) $', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
+		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = diffussion_fit_values, ylim = ylim, xlim = xlim, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Confinement ratio' , ylabel = r'$ K_{\beta} \; (\mu m^2/min^{\beta}) $', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 
-	def showScalingExponentConfinementRatio ( self, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
+	def showScalingExponentConfinementRatio ( self, ylim = None, xlim = None, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
 		
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -2247,9 +2484,9 @@ class multi_graph :
 			exponent_fit_values.append( self.motilitys[i].getScalingExponentFit() )
 
 		xsize = ( 6*len(ratio_confinement) ,5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = exponent_fit_values, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Confinement ratio' , ylabel = r'$\beta$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
+		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = exponent_fit_values, ylim = ylim, xlim = xlim, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Confinement ratio' , ylabel = r'$\beta$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 	
-	def showDiffusionCoefficientFractalDimension ( self, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
+	def showDiffusionCoefficientFractalDimension ( self, ylim = None, xlim= None, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
 
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -2262,9 +2499,9 @@ class multi_graph :
 			diffussion_fit_values.append( self.motilitys[i].getGeneralisedDiffusionCoefficientFit() )
 
 		xsize = ( 6*len(diffussion_fit_values) ,5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = fractal, ydata = diffussion_fit_values, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = r'$d_f$' , ylabel = r'$ K_{\beta} \; (\mu m^2/min^{\beta}) $', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
+		return self._util.scheme_scatter( xdata = fractal, ydata = diffussion_fit_values, ylim = ylim, xlim = xlim, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = r'$d_f$' , ylabel = r'$ K_{\beta} \; (\mu m^2/min^{\beta}) $', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 
-	def showScalingExponentFractalDimension ( self, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ) :
+	def showScalingExponentFractalDimension ( self, ylim = None, xlim = None, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ) :
 
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -2277,9 +2514,9 @@ class multi_graph :
 			fractal.append( self.motilitys[i].getGlobalFractalDimension() )
 
 		xsize = ( 6*len(exponent_fit_values) ,5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = fractal, ydata = exponent_fit_values, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = r'$d_f$' , ylabel = r'$\beta$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
+		return self._util.scheme_scatter( xdata = fractal, ydata = exponent_fit_values, ylim = ylim, xlim = xlim, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = r'$d_f$' , ylabel = r'$\beta$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 
-	def showDiffusionCoefficientDisplacementRatio ( self, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False,is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
+	def showDiffusionCoefficientDisplacementRatio ( self, ylim = None, xlim = None, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False,is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
 		
 		if is_set_fit_TAMSD :
 			for i in range( len(self.motilitys) ):
@@ -2292,7 +2529,7 @@ class multi_graph :
 			diffussion_fit_values.append( self.motilitys[i].getGeneralisedDiffusionCoefficientFit() )
 
 		xsize = ( 6*len(ratio_displacement) ,5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = ratio_displacement, ydata = diffussion_fit_values, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Displacement ratio' , ylabel = r'$ K_{\beta} $', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
+		return self._util.scheme_scatter( xdata = ratio_displacement, ydata = diffussion_fit_values, ylim = ylim, xlim = xlim, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Displacement ratio' , ylabel = r'$ K_{\beta} $', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 
 	def showScalingExponentDisplacementRatio ( self, is_set_fit_TAMSD = False, window_TAMSD = (1,6), is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
 		
@@ -2339,7 +2576,7 @@ class multi_graph :
 		xsize = ( 6*len(ratio_outreach) ,5) if is_multi else (6,5)
 		return self._util.scheme_scatter( xdata = ratio_outreach, ydata = exponent_fit_values, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Outreach ratio' , ylabel = r'$\beta$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 
-	def showFractalDimensionConfinementRatio ( self, is_multi = False, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ) :
+	def showFractalDimensionConfinementRatio ( self, is_multi = False, ylim = None, xlim = None, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ) :
 
 		ratio_confinement = []
 		fractal = []
@@ -2348,9 +2585,9 @@ class multi_graph :
 			fractal.append( self.motilitys[i].getGlobalFractalDimension() )
 
 		xsize = ( 6*len(ratio_confinement) ,5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = fractal, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Confinement ratio' , ylabel = r'$d_f$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
+		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = fractal, ylim = ylim, xlim = xlim, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Confinement ratio' , ylabel = r'$d_f$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 
-	def showHistFractalDimension ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+	def showHistFractalDimension ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, is_vertical = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 		
 		fractal = []
 		for i in range( len(self.motilitys) ):
@@ -2358,9 +2595,9 @@ class multi_graph :
 		
 		y_label = r'P( $d_f$ )' if is_density else r'N( $d_f$ )'
 		if dtype == 'hist' :
-			return self._util.scheme_hist( data = fractal, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$d_f$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_hist( data = fractal, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$d_f$', density = is_density, is_legend = is_legend, is_multi = is_multi, is_vertical = is_vertical, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = fractal, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$d_f$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = fractal, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$d_f$', density = is_density, is_legend = is_legend, is_multi = is_multi, is_vertical = is_vertical, bins = bins, xscale = xscale, yscale = yscale )
 
 	def showInterQuartileFractalDimension ( self, is_test = False, showfliers = True ):
 
@@ -2370,7 +2607,7 @@ class multi_graph :
 
 		return self._util.scheme_single_boxplot( data = fractal, ylabel = r'$d_f$', is_test = is_test, showfliers = showfliers )
 
-	def showHistPersistenceRatio ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+	def showHistPersistenceRatio ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 
 		persistenceratio = []
 		for i in range( len(self.motilitys) ):
@@ -2378,9 +2615,9 @@ class multi_graph :
 
 		y_label = 'P( Confinement ratio )' if is_density else 'N( Confinement ratio )'
 		if dtype == 'hist' :
-			return self._util.scheme_hist( data = persistenceratio, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = 'Confinement ratio', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_hist( data = persistenceratio, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = 'Confinement ratio', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = persistenceratio, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = 'Confinement ratio', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = persistenceratio, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = 'Confinement ratio', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 
 	def showInterQuartilePersistenceRatio ( self, is_test = False, is_ns_test = False, showfliers = True ):
 
@@ -2486,7 +2723,7 @@ class multi_graph :
 		elif dtype == 'scatter':
 			return self._util.scheme_scatter_hist( data = convex_hull_acir, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = 'a', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 
-	def showAverageDistancePersistence ( self, show_std = True, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, xscale = 'linear', yscale = 'linear' ):
+	def showAverageDistancePersistence ( self, show_std = True, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 		timepersistence = []
 		avgpersistence = []
 		stdpersistence = []
@@ -2497,7 +2734,7 @@ class multi_graph :
 			if show_std :
 				stdpersistence.append( std )
 
-		return self._util.scheme_plot_fill( xdata = timepersistence, ydata = avgpersistence, ystd = stdpersistence, xlabel = 'Time (min)', ylabel = 'Temporal confinement ratio', is_legend = True, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xscale = xscale, yscale = yscale )
+		return self._util.scheme_plot_fill( xdata = timepersistence, ydata = avgpersistence, ystd = stdpersistence, xlabel = 'Time (min)', ylabel = 'Temporal confinement ratio', is_legend = True, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xscale = xscale, yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 	
 	# Generalized Diffusion Coefficient 
 
@@ -2578,7 +2815,7 @@ class multi_graph :
 
 	# convex hull 
 
-	def showConvexHullAreaConfinementRatio ( self, ylim = None, is_multi = False, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
+	def showConvexHullAreaConfinementRatio ( self, ylim = None, xlim = None, is_multi = False, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear', is_legend = False ):
 
 		convexhullarea = []
 		ratio_confinement = []
@@ -2587,11 +2824,11 @@ class multi_graph :
 			ratio_confinement.append( self.motilitys[i].getGlobalPersistenceRatio() )
 
 		xsize = ( 6*len(self.motilitys) ,5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = convexhullarea, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Confinement ratio' , ylabel = r'A $(\mu m^2)$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
+		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = convexhullarea, ylim = ylim, xlim = xlim, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = 'Confinement ratio' , ylabel = r'A $(\mu m^2)$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale, is_legend = is_legend )
 
 	# all Moments MSD
 
-	def showMomentRatioMSD( self, is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear' ):
+	def showMomentRatioMSD( self, is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		time = []
 		ratio = []
@@ -2602,14 +2839,14 @@ class multi_graph :
 			ratio.append( xratio )
 		
 		xsize = (6*len(self.motilitys), 5) if is_multi else (6, 5)
-		xinfo_fit, xplt = self._util.scheme_scatter( xdata = time, ydata = ratio, xlabel = 't (min)', ylabel = r'$\langle r(t)^4 \rangle / {\langle r(t)^2 \rangle}^2 $', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale )
+		xinfo_fit, xplt = self._util.scheme_scatter( xdata = time, ydata = ratio, xlabel = 't (min)', ylabel = r'$\langle r(t)^4 \rangle / {\langle r(t)^2 \rangle}^2 $', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		if not is_multi:
 			i_nonnan = numpy.where( ~numpy.isnan(ratio[0]) )[0]
 			xplt.plot([0, time[0][i_nonnan[-1]] ],[2,2], color='black', linestyle=':')
 
 		return xinfo_fit, xplt
 
-	def showMomentRatioMME( self, is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear' ):
+	def showMomentRatioMME( self, is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		time = []
 		ratio = []
@@ -2620,17 +2857,14 @@ class multi_graph :
 			ratio.append( xratio )
 
 		xsize = (6*len(self.motilitys), 5) if is_multi else (6, 5)
-		xinfo_fit, xplt = self._util.scheme_plot_fill( xdata = time, ydata = ratio, xlabel = 't (min)', ylabel = r'$\langle r(t)_{max}^4 \rangle / {\langle r(t)_{max}^2 \rangle}^2 $', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale )
+		xinfo_fit, xplt = self._util.scheme_plot_fill( xdata = time, ydata = ratio, xlabel = 't (min)', ylabel = r'$\langle r(t)_{max}^4 \rangle / {\langle r(t)_{max}^2 \rangle}^2 $', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		if not is_multi:
 			i_nonnan = numpy.where( ~numpy.isnan(ratio[0]) )[0]
 			xplt.plot([0, time[0][i_nonnan[-1]] ],[1.49,1.49], color='black', linestyle=':')
 
 		return xinfo_fit, xplt
 
-	def showMomentsMSD ( self, exponents = [2], is_fit = False, window = (0,10), is_legend = False, xscale = 'linear', yscale = 'linear' ):
-
-		def fit_tamsd(t, alpha, org):
-			return alpha*t + org
+	def showMomentsMSD ( self, exponents = [2], is_fit = False, window = (0,10), is_legend = False, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 
 		const_fits = []
 		plt.figure( figsize =( 6*len(self.motilitys) ,5) )
@@ -2644,11 +2878,11 @@ class multi_graph :
 				plt.scatter( time, xmoments, marker = 'o', c = xcolor[j].hex, s = 100, alpha = 0.5, label = 'q = '+str(exponents[j]) )			
 			
 				if is_fit :
-					xrest = curve_fit( fit_tamsd, numpy.log10(time[window[0]:window[1]]), numpy.log10( xmoments[ window[0]:window[1] ] ) )
-					plt.plot( time[window[0]:window[1]],  numpy.power(time[window[0]:window[1]], xrest[0][0] )*math.pow(10, xrest[0][1]), color = xcolor[j].hex, lw = 2 )
-					plt.text( numpy.average(time[0]), numpy.average(xmoments[0]), ' slope '+str( round(xrest[0][0],2) ), color = xcolor[j].hex )
+					xrest = linregress( numpy.log10(time[window[0]:window[1]]), numpy.log10( xmoments[ window[0]:window[1] ] ) )
+					plt.plot( time[window[0]:window[1]],  numpy.power(time[window[0]:window[1]], xrest.slope )*math.pow(10, xrest.intercept), color = xcolor[j].hex, lw = 2 )
+					plt.text( numpy.average(time[0]), numpy.average(xmoments[0]), ' slope '+str( round(xrest.slope,2) ), color = xcolor[j].hex )
 
-					const_fits.append( { 'name':self._names[i], 'moment':exponents[j], 'constant': math.pow(10, xrest[0][1]), 'slope': xrest[0][0] } )
+					const_fits.append( { 'name':self._names[i], 'moment':exponents[j], 'constant': math.pow(10, xrest.intercept), 'std constant': (math.pow(10, xrest.intercept + xrest.intercept_stderr) - math.pow(10, xrest.intercept - xrest.intercept_stderr))*0.5, 'slope': xrest.slope, 'std slope': xrest.stderr } )
 
 			plt.xscale( xscale )
 			plt.yscale( yscale )
@@ -2658,7 +2892,13 @@ class multi_graph :
 			plt.ylabel( r'$\langle |r(t)|^q \rangle \; (\mu m^q)$', fontdict = { 'size' : self._font_size } )
 			plt.grid( linestyle = ':' )
 			if is_legend:
-				plt.legend( frameon = False )
+				plt.legend( frameon = False, loc= loc_legend )
+
+			if is_hd_ns :
+				lims = plt.axis()
+				plt.ylim( [ lims[2], lims[3] ] )
+				plt.xlim( [ lims[0], lims[1] ] )
+				plt.gca().add_patch( pat.Rectangle( ( x_hd_ns,lims[2]), (lims[1] - x_hd_ns) , (lims[3] - lims[2]), alpha = alpha_hd_ns, color = color_hd_ns, hatch = hatch_hd_ns ) )
 	
 		plt.tight_layout()
 
@@ -2721,7 +2961,7 @@ class multi_graph :
 					plt.plot( xsplit_2, res_2.intercept + res_2.slope*xsplit_2, color = self._colors[i] )
 					plt.vlines( x_intercept, 0, exponents[ len(exponents) -1 ], colors = ['darkgray'], linestyles = ':', lw = 4 )
 
-					const_fits.append( { 'slope 1' : res_1.slope, 'intercept 1' : res_1.intercept, 'slope 2' : res_2.slope, 'intercept 2' : res_2.intercept, 'x intercept' : x_intercept, 'y intercept' : y_intercept } )
+					const_fits.append( { 'slope 1' : res_1.slope, 'std slope 1' : res_1.stderr, 'intercept 1' : res_1.intercept, 'std intercept 1' : res_1.intercept_stderr, 'slope 2' : res_2.slope, 'std slope 2' : res_2.stderr, 'intercept 2' : res_2.intercept, 'std intercept 2' : res_2.intercept_stderr, 'x intercept' : x_intercept, 'y intercept' : y_intercept } )
 				
 			if is_multi :
 				plt.xticks( fontsize = self._font_size )
@@ -2749,7 +2989,7 @@ class multi_graph :
 
 	# gaussianity parameter
 
-	def showGaussianityParameter ( self, is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear' ):
+	def showGaussianityParameter ( self, is_multi= False, is_color = False, is_legend = False, xscale = 'linear', yscale = 'linear', is_hd_ns = False, x_hd_ns = 0, color_hd_ns = 'dimgray', alpha_hd_ns = 0.5, hatch_hd_ns = None, loc_legend = 'best' ):
 		
 		time = []
 		gauss = []
@@ -2760,7 +3000,7 @@ class multi_graph :
 			gauss.append( xgass )
 		
 		xsize = (6*len(self.motilitys), 5) if is_multi else (6, 5)
-		xinfo_fit, xplt = self._util.scheme_scatter( xdata = time, ydata = gauss, xlabel = r'$\Delta \; (min)$', ylabel = r'$G( \Delta )$', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale )
+		xinfo_fit, xplt = self._util.scheme_scatter( xdata = time, ydata = gauss, xlabel = r'$\Delta \; (min)$', ylabel = r'$G( \Delta )$', size = xsize, alpha = 0.5, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale, is_hd_ns = is_hd_ns, x_hd_ns = x_hd_ns, color_hd_ns = color_hd_ns, alpha_hd_ns = alpha_hd_ns, hatch_hd_ns = hatch_hd_ns, loc_legend = loc_legend )
 		if not is_multi:
 			i_nonnan = numpy.where( ~numpy.isnan(gauss[0]) )[0]
 			xplt.plot([0, time[0][i_nonnan[-1]] ],[0,0], color='black', linestyle=':')
@@ -2828,9 +3068,9 @@ class multi_graph :
 		else:
 			return self._util.scheme_plot_fill( xdata = time, ydata = pc, is_multi = is_multi, is_axis_equal = False, size = xsize, is_color = is_color, xlabel = ' t (min) ', ylabel = r'$P_c \; (\mu m^{-2})$', is_legend = is_legend )
 
-	# persistence time
+	# persistence time @ turning angle
 
-	def showHistPersistenceTime ( self, dtype = 'hist', ylim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+	def showHistPersistenceTime ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
 
 		time = []
 		for i in range( len(self.motilitys) ):
@@ -2839,9 +3079,9 @@ class multi_graph :
 		
 		y_label = r'$P( t_p )$' if is_density else r'$N( t_p )$'
 		if dtype == 'hist' :
-			return self._util.scheme_hist( data = time, ylim = ylim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$t_p \; (min)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_hist( data = time, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$t_p \; (min)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 		elif dtype == 'scatter':
-			return self._util.scheme_scatter_hist( data = time, ylim = ylim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$t_p \; (min)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+			return self._util.scheme_scatter_hist( data = time, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$t_p \; (min)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 
 	def showEndToEndDistanceVsTimePersistence ( self, is_multi= False, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_color = False, is_legend = False, alpha = 0.5, xscale = 'linear', yscale = 'linear' ) :
 
@@ -2868,6 +3108,108 @@ class multi_graph :
 		
 		xsize = (6*len(self.motilitys), 5) if is_multi else (6, 5)
 		return self._util.scheme_scatter( xdata = time, ydata = distance, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, xlabel = r'$ t_p \; (min)$', ylabel = r'$\mathcal{L}_P^{\;total} \; (\mu m) $', size = xsize, alpha = alpha, is_multi = is_multi, is_color = is_color, is_legend = is_legend, xscale = xscale, yscale = yscale )
+
+	# persistence time @ persistence angle
+
+	def showHistTimePersistenceAngle ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		time = []
+		for i in range( len(self.motilitys) ):
+			xdata = self.motilitys[i].getLengthTimePersistenceAngle()
+			time.append( xdata[:,0] )
+		
+		y_label = r'$P( \mathfrak{T}_p )$' if is_density else r'$N( \mathfrak{T}_p )$'
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = time, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$\mathfrak{T}_p \; (min)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = time, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$\mathfrak{T}_p \; (min)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistEndToEndDistancePersistenceAngle ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		endtoenddistance = []
+		for i in range( len(self.motilitys) ):
+			xdata = self.motilitys[i].getLengthTimePersistenceAngle()
+			endtoenddistance.append( xdata[:,1] )
+		
+		y_label = r'$P( \mathfrak{L}_p^{net} )$' if is_density else r'$N( \mathfrak{L}_p^{net} )$'
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = endtoenddistance, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$\mathfrak{L}_p^{net} \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = endtoenddistance, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$\mathfrak{L}_p^{net} \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistTotalDistancePersistenceAngle ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'normal', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		totaldistancetraveled = []
+		for i in range( len(self.motilitys) ):
+			xdata = self.motilitys[i].getLengthTimePersistenceAngle()
+			totaldistancetraveled.append( xdata[:,2] )
+		
+		y_label = r'$P( \mathfrak{L}_p^{total} )$' if is_density else r'$N( \mathfrak{L}_p^{total} )$'
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = totaldistancetraveled, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$\mathfrak{L}_p^{total} \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = totaldistancetraveled, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = y_label, xlabel = r'$\mathfrak{L}_p^{total} \; (\mu m)$', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	# check initial and final position
+
+	def showInstantaneousSpeedTime ( self, ylim = None, xlim = None, is_binned = False, bins = 20, is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ) :
+
+		instantaneousspeed = []
+		time = []
+		for i in range( len(self.motilitys) ):
+			xtime, xspeed = self.motilitys[i].getAllVelocity()
+			time.append( xtime.flatten()[ ~numpy.isnan( xspeed.flatten() ) ] )
+			instantaneousspeed.append( xspeed.flatten()[ ~numpy.isnan( xspeed.flatten() ) ] )
+
+		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
+		return self._util.scheme_scatter( xdata = time, ydata = instantaneousspeed, ylim = ylim, xlim = xlim, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = 'time (min)', ylabel = r'$\nu \; (\mu m.min^{-1})$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+
+	def showInstantaneousSpeedCellSize ( self, ylim = None, xlim = None, is_binned = False, bins = 20, is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ) :
+
+		instantaneousspeed = []
+		cellsize = []
+		for i in range( len(self.motilitys) ):
+			xcellsize, xspeed = self.motilitys[i].getAllVelocityCellSize()
+			cellsize.append( xcellsize.flatten()[ ~numpy.isnan( xspeed.flatten() ) ] )
+			instantaneousspeed.append( xspeed.flatten()[ ~numpy.isnan( xspeed.flatten() ) ] )
+
+		xsize = (6*len(self.motilitys),5) if is_multi else (6,5)
+		return self._util.scheme_scatter( xdata = cellsize, ydata = instantaneousspeed, ylim = ylim, xlim = xlim, is_binned = is_binned, bins = bins, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = 'Cell size ($\mu m$)', ylabel = r'$\nu \; (\mu m.min^{-1})$', size = xsize, is_multi = is_multi, is_legend = is_legend, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+
+
+	def showInterQuartileInitialFinalMeanCurvilinearSpeed ( self, length = 3, is_test = False, is_ns_test = False, showfliers = True ):
+
+		initialspeed = []
+		finalspeed = []
+		for i in range( len(self.motilitys) ):
+			initialspeed.append( self.motilitys[i].getInitialMeanCurvilinearSpeed( length = length, is_flat = True ) )
+			finalspeed.append( self.motilitys[i].getFinalMeanCurvilinearSpeed( length = length, is_flat = True ) )
+
+		return self._util.scheme_multiple_boxplot( data = [ initialspeed, finalspeed ], xlabels = self._names , ylabel = 'Mean Curvilinear Speed ($\mu m/min$)', is_legend = True, color_box = [ 'dimgray', 'lightgray' ], label_legend = [ 'After', 'Before' ], showfliers = showfliers, spancap = 3, is_test = is_test, is_ns_test = is_ns_test )
+
+	def showInitialFinalMeanCurvilinearSpeedTime ( self, length = 3, ylim = None, is_fit = False, type_fit = 'linear', window = None, is_multi = False, is_legend = False, is_binned = False, bins = 20, marker = 'o', markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ):
+
+		afterspeed = []
+		beforespeed = []
+		time = []
+		for i in range( len(self.motilitys) ):
+			xitime, xispeed, xistdspeed, xicellsize, xistdcellsize = self.motilitys[i].getInitialMeanCurvilinearSpeed( length = length )
+			xftime, xfspeed, xfstdspeed, xfcellsize, xfstdcellsize = self.motilitys[i].getFinalMeanCurvilinearSpeed( length = length )
+
+			xcolor = Color( self._colors[i] )
+			xcolor.saturation = 0.5
+
+			xutil = util ( font_size = self._font_size, colors = [ self._colors[i], xcolor.hex ], names = ['After','Before'] )
+			xsize = (6*2, 5) if is_multi else (6, 5)
+			ylimit = ylim[i] if ylim else None
+			xinfo, xplt = xutil.scheme_scatter( xdata = [ xitime, xftime ], ydata = [ xispeed, xfspeed ], ylim = ylimit, is_fit = is_fit, type_fit = type_fit, window = window, xlabel = 'time (min)', ylabel = 'Mean Curvilinear Speed ($\mu m/min$)', size = xsize, is_multi = is_multi, is_legend = is_legend, is_binned = is_binned, bins = bins, marker = marker, markersize = markersize, alpha = alpha, xscale = xscale , yscale = yscale )
+			if is_legend : 
+				if is_multi :
+					xplt.suptitle( self._names[i], fontsize = self._font_size, linespacing = 20 )
+				else:
+					xplt.title( self._names[i], fontdict = { 'fontsize': self._font_size } )
+			xplt.tight_layout()
+			xplt.show()
 
 	# global FMI
 
@@ -2905,7 +3247,7 @@ class multi_graph :
 		for i in range( len(self.motilitys) ):
 			endtoenddistance.append( self.motilitys[i].getGlobalEndtoEndDistance() )
 
-		return self._util.scheme_single_boxplot( data = endtoenddistance, ylabel = 'Net distance traveled ($\mu m$)', is_test = is_test )
+		return self._util.scheme_single_boxplot( data = endtoenddistance, ylabel = r'Net distance traveled ($\mu m$)', is_test = is_test )
 
 	def showGlobalPath ( self, is_test = False ):
 
@@ -2955,6 +3297,47 @@ class multi_graph :
 			lengths.append([ path, endtoend, maxd ])
 
 		return self._util.scheme_multiple_boxplot( data = lengths, xlabels = ['Total distance traveled','Net distance traveled','Max distance traveled'], ylabel = 'Length ($\mu m$)', is_legend = True, spancap = 3, is_test = is_test )
+
+	# global length distributions
+
+	def showHistGlobalEndtoEndDistance ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		endtoenddistance = []
+		for i in range( len(self.motilitys) ):
+			endtoenddistance.append( self.motilitys[i].getGlobalEndtoEndDistance() )
+		
+		ylabel = 'P( Net distance traveled )' if is_density else 'N( Net distance traveled )'
+
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = endtoenddistance, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'Net distance traveled ($\mu m$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = endtoenddistance, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'Net distance traveled ($\mu m$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistGlobalPath ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		pathtotal = []
+		for i in range( len(self.motilitys) ):
+			pathtotal.append( self.motilitys[i].getGlobalPath() )
+		
+		ylabel = 'P( Total distance traveled )' if is_density else 'N( Total distance traveled )'
+
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = pathtotal, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'Total distance traveled ($\mu m$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = pathtotal, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'Total distance traveled ($\mu m$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+
+	def showHistGlobalMaxDistance ( self, dtype = 'hist', ylim = None, xlim = None, is_multi = False, marker = 'o', markersize = 10, is_fit = False, type_fit = 'linear', htype = 'bar', xscale = 'linear', yscale = 'linear', bins = 10, is_density = False, is_legend = False ):
+
+		maxdistance = []
+		for i in range( len(self.motilitys) ):
+			maxdistance.append( self.motilitys[i].getGlobalMaxDistance() )
+		
+		ylabel = 'P( Max distance traveled )' if is_density else 'N( Max distance traveled )'
+
+		if dtype == 'hist' :
+			return self._util.scheme_hist( data = maxdistance, ylim = ylim, xlim = xlim, htype = htype, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'Max distance traveled ($\mu m$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
+		elif dtype == 'scatter':
+			return self._util.scheme_scatter_hist( data = maxdistance, ylim = ylim, xlim = xlim, marker = marker, markersize = markersize, is_fit = is_fit, type_fit = type_fit, ylabel = ylabel, xlabel = r'Max distance traveled ($\mu m$)', density = is_density, is_legend = is_legend, is_multi = is_multi, bins = bins, xscale = xscale, yscale = yscale )
 
 	# global ratios
 
@@ -3095,7 +3478,7 @@ class multi_graph :
 		xsize = ( 6*len(self.motilitys) ,5) if is_multi else (6,5)
 		return self._util.scheme_scatter( xdata = fractal, ydata = meanstraightlinespeed, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, ylabel = 'Mean Straight Line Speed ($\mu m/min$)' , xlabel = r'$d_f$', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale )
 
-	def showMeanCurvilinearSpeedConfinementRatio ( self, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ) :
+	def showMeanCurvilinearSpeedConfinementRatio ( self, ylim = None, xlim = None, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ) :
 		
 		ratio_confinement = []
 		meancurvilinearspeed = []
@@ -3104,7 +3487,7 @@ class multi_graph :
 			meancurvilinearspeed.append( self.motilitys[i].getGlobalMeanCurvilinearSpeed() )
 
 		xsize = ( 6*len(self.motilitys) ,5) if is_multi else (6,5)
-		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = meancurvilinearspeed, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, ylabel = 'Mean Curvilinear Speed ($\mu m/min$)' , xlabel = 'Confinement ratio', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale )
+		return self._util.scheme_scatter( xdata = ratio_confinement, ydata = meancurvilinearspeed, ylim = ylim, xlim = xlim, is_fit = is_fit, is_fit_all = is_fit_all, type_fit = type_fit, window = window, ylabel = 'Mean Curvilinear Speed ($\mu m/min$)' , xlabel = 'Confinement ratio', is_multi = is_multi, size = xsize, markersize = markersize, alpha = alpha, xscale = xscale, yscale = yscale )
 
 	def showMeanStraightLineSpeedConfinementRatio ( self, is_fit = False, is_fit_all = False, type_fit = 'linear', window = None, is_multi = False, markersize = 100, alpha = 0.5, xscale = 'linear', yscale = 'linear' ) :
 		

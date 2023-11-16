@@ -14,7 +14,7 @@ class motility :
 		self.micron_px = micron_px
 		self.time_seq = time_seq
 		self.time_adquisition = time_acquisition
-		self.frame = numpy.full( ( time_acquisition, len(self.data), 25 ), numpy.nan )
+		self.frame = numpy.full( ( time_acquisition, len(self.data), 30 ), numpy.nan )
 		self.divison_time = []
 		self.cell_size = []
 		self.aspect_ratio = []
@@ -37,11 +37,16 @@ class motility :
 
 		# x, y, angle, view angle
 		for i in range( len(self.data) ):
+			enddX = (self.data[i][len(self.data[i])-1][3] - self.data[i][0][3])*self.micron_px
+			enddY = (self.data[i][len(self.data[i])-1][4] - self.data[i][0][4])*self.micron_px
+			enddistance = math.sqrt( math.pow( enddX, 2 ) + math.pow( enddY, 2 ) )
 			for j in range( len(self.data[i]) ):
 				self.frame[self.data[i][j][0],i,0] = self.data[i][j][3]*self.micron_px
 				self.frame[self.data[i][j][0],i,1] = self.data[i][j][4]*self.micron_px
 				self.frame[self.data[i][j][0],i,10] = self.data[i][j][5]
 				self.frame[self.data[i][j][0],i,22] = self.data[i][j][1]*self.micron_px
+				self.frame[self.data[i][j][0],i,25] = self.data[i][j][6]
+				self.frame[self.data[i][j][0],i,26] = self.data[i][j][0]*self.time_seq
 				if j > 0 :
 					viewtheta = math.atan( (self.data[i][j][4] - self.data[i][0][4])/(self.data[i][j][3] - self.data[i][0][3]) )*180/math.pi
 					self.frame[self.data[i][j-1][0],i,15] = viewtheta
@@ -68,6 +73,14 @@ class motility :
 					ldistance = math.sqrt( math.pow( ldX, 2 ) + math.pow( ldY, 2 ) )				
 
 					self.frame[self.data[i][j][0],i,21] = math.acos( round( ( fdX*ldX + fdY*ldY )/(fdistance*ldistance), 2) )*180/math.pi
+					
+				# persistence angle
+				if j > 0 :
+					fdX = (self.data[i][j][3] - self.data[i][j-1][3])*self.micron_px
+					fdY = (self.data[i][j][4] - self.data[i][j-1][4])*self.micron_px
+					fdistance = math.sqrt( math.pow( fdX, 2 ) + math.pow( fdY, 2 ) )
+
+					self.frame[self.data[i][j][0],i,24] = math.acos( round( ( fdX*enddX + fdY*enddY )/(fdistance*enddistance), 2) )*180/math.pi
 
 
 		# deltaX, deltaY, distance, velocity x, velocity x, instant velocity
@@ -146,7 +159,10 @@ class motility :
 			self.cell_size.append( path[0][1]*self.micron_px )
 			self.growth_rate.append( abs(path[ len(path) -1 ][1] - path[0][1])*self.micron_px/(len(path)*self.time_seq - self.time_seq) )
 
+		# check turning angle >= 90
 		self.frame[ self.frame[:,:,21]>= 90 , 12] = 1
+		# check persistence angle >= 90
+		self.frame[ self.frame[:,:,24]>= 90 , 25] = 1
 
 		# run rollXYDistance
 		self.rollXYDistance()
@@ -638,7 +654,50 @@ class motility :
 		if is_flat :
 			return self.frame[:,:,7].flatten()[ ~numpy.isnan( self.frame[:,:,7].flatten() ) ]
 		else:
-			return self.frame[:,:,7]
+			return self.frame[:,:,26], self.frame[:,:,7]
+
+	def getAllVelocityCellSize ( self ):
+		return self.frame[:,:,22], self.frame[:,:,7]
+
+	def getAllInitialInstantaneousVelocities ( self, length = 1, is_flat = False ):
+
+		position = [ numpy.arange(i,i+length,1,dtype=int).tolist() for i in self.frame_global[:,50].astype(numpy.int32) + 1 ]
+		cells = [ [i] for i in range(self.frame_global.shape[0]) ]
+
+		if is_flat :
+			return self.frame[position,cells,7].flatten()[ ~numpy.isnan( self.frame[position,cells,7].flatten() ) ]
+		else:
+			return numpy.array(position)*self.time_seq, self.frame[position,cells,7]
+
+	def getAllFinalInstantaneousVelocities ( self, length = 1, is_flat = False ):
+
+		position = [ numpy.arange(i-length,i,1,dtype=int).tolist() for i in self.frame_global[:,51].astype(numpy.int32) + 1 ]
+		cells = [ [i] for i in range(self.frame_global.shape[0]) ]
+
+		if is_flat :
+			return self.frame[position,cells,7].flatten()[ ~numpy.isnan( self.frame[position,cells,7].flatten() ) ]
+		else:
+			return numpy.array(position)*self.time_seq, self.frame[position,cells,7]
+
+	def getInitialMeanCurvilinearSpeed ( self, length = 1, is_flat = False ):
+
+		position = [ numpy.arange(i,i+length,1,dtype=int).tolist() for i in self.frame_global[:,50].astype(numpy.int32) + 1 ]
+		cells = [ [i] for i in range(self.frame_global.shape[0]) ]
+
+		if is_flat :
+			return numpy.nanmean( self.frame[position,cells,7], axis = 1 ).flatten()
+		else :
+			return numpy.average( numpy.array(position), axis = 1 )*self.time_seq, numpy.nanmean( self.frame[position,cells,7], axis = 1 ), numpy.nanstd( self.frame[position,cells,7], axis = 1 ), numpy.nanmean( self.frame[position,cells,22], axis = 1 ), numpy.nanstd( self.frame[position,cells,22], axis = 1 )
+
+	def getFinalMeanCurvilinearSpeed ( self, length = 1, is_flat = False ):
+
+		position = [ numpy.arange(i-length,i,1,dtype=int).tolist() for i in self.frame_global[:,51].astype(numpy.int32) + 1 ]
+		cells = [ [i] for i in range(self.frame_global.shape[0]) ]
+
+		if is_flat :
+			return numpy.nanmean( self.frame[position,cells,7], axis = 1 ).flatten()
+		else :
+			return numpy.average( numpy.array(position), axis = 1 )*self.time_seq, numpy.nanmean( self.frame[position,cells,7], axis = 1 ), numpy.nanstd( self.frame[position,cells,7], axis = 1 ), numpy.nanmean( self.frame[position,cells,22], axis = 1 ), numpy.nanstd( self.frame[position,cells,22], axis = 1 )
 
 	def getAllNormVelocityCorrelation ( self ):
 		return numpy.arange(0, self.frame.shape[0], 1, dtype = int)*self.time_seq, self.shift_corr[:,:,0]
@@ -680,6 +739,7 @@ class motility :
 
 		return xbin, ybin
 	
+	# turning angle
 	def getDataPersistenceTime ( self ):
 
 		data = []
@@ -693,6 +753,29 @@ class motility :
 				path_per = numpy.sum( numpy.sqrt( numpy.power(self.frame[ (index_start+1):(i_nonnan[i]+1),cell,0] - self.frame[ index_start:i_nonnan[i],cell,0],2) + numpy.power(self.frame[ (index_start+1):(i_nonnan[i]+1),cell,1] - self.frame[ index_start:i_nonnan[i],cell,1],2) ) )
 
 				data.append( [ time_per, endtoend_per, path_per ])
+
+		return numpy.array(data)
+
+	# persistence angle
+	def getLengthTimePersistenceAngle ( self ):
+
+		data = []
+		i_nonper = numpy.where( numpy.nansum( self.frame[:,:,25], axis = 0 ) > 0 )[0]
+		for cell in i_nonper:
+			i_nonnan = numpy.where( ~numpy.isnan( self.frame[:,cell,25] ) )[0]
+			if len(i_nonnan) == 0 :
+				time_per = int(self.frame_global[cell,51] - self.frame_global[cell,50])
+				endtoend_per = self.frame_global[cell,7]
+				path_per = self.frame_global[cell,4]
+				data.append( [ time_per, endtoend_per, path_per ])
+			else:
+				for i in range( len(i_nonnan) ):
+					index_start = int(self.frame_global[cell,50]) if i == 0 else (i_nonnan[i-1])
+					time_per = (i_nonnan[i] - index_start)*self.time_seq
+					endtoend_per = math.sqrt( math.pow(self.frame[ i_nonnan[i], cell, 0 ] - self.frame[ index_start, cell, 0 ],2) + math.pow(self.frame[ i_nonnan[i], cell, 1 ] - self.frame[ index_start, cell, 1 ],2) )
+					path_per = numpy.sum( numpy.sqrt( numpy.power(self.frame[ (index_start+1):(i_nonnan[i]+1),cell,0] - self.frame[ index_start:i_nonnan[i],cell,0],2) + numpy.power(self.frame[ (index_start+1):(i_nonnan[i]+1),cell,1] - self.frame[ index_start:i_nonnan[i],cell,1],2) ) )
+
+					data.append( [ time_per, endtoend_per, path_per ])
 
 		return numpy.array(data)
 		
@@ -1363,6 +1446,22 @@ class motility :
 	def getFirstGeneralisedDiffusionCoefficientFitTAMME ( self ):
 		return self.frame_global[:,49]	
 
+	def savetxt ( self, filename ) :
+
+		import os
+		
+		xpath = filename if os.path.isabs(filename) else os.getcwd()+"\\"+filename
+
+		f = open(xpath, "a")
+		strln = "particle" + "\t" + "time (min)" + "\t" + "x-axis (um)" + "\t" + "y-axis (um)" + "\t" + "major axis (um)" + "\t" + "minor axis (um)" + "\t" + "cell body orientation (deg)" + "\t" + "step orientation (deg)" + "\n"
+		f.write(strln)
+
+		for i in range( len(self.data) ):
+			for j in range( len(self.data[i]) ):
+				strln = str(i+1) + "\t" + str( self.data[i][j][0]*self.time_seq ) + "\t" + str( self.data[i][j][3]*self.micron_px ) + "\t" + str( self.data[i][j][4]*self.micron_px ) + "\t" + str( self.data[i][j][1]*self.micron_px ) + "\t" + str( self.data[i][j][2]*self.micron_px ) + "\t" + str( self.data[i][j][6] ) + "\t" + str( self.data[i][j][5] ) + "\n"
+				f.write(strln)
+
+		f.close()
 
 	def __refreshGraph ( self ):
 
